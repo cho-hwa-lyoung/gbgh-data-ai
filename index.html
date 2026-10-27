@@ -1,0 +1,1077 @@
+<!doctype html>
+<html lang="ko">
+<meta charset="utf-8">
+<title>경북여고 데이터·AI 교실</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<meta name="description" content="경북여자고등학교 정보 수업 · 데이터와 인공지능 단원 차시별 교재와 인터랙티브 실험실">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: 애플 제품 페이지처럼 넓은 여백 + 큰 타이포 + 단원별 색 타일. 홈(허브) ↔ 차시 페이지를 해시로 전환 */
+:root{
+  --bg:#fbfbfd; --surface:#ffffff; --surface2:#f2f2f6; --fg:#1d1d1f; --muted:#6e6e73; --line:rgba(20,20,40,.09); --grid:rgba(20,20,40,.07);
+  --accent:#0066cc; --accent-ink:#ffffff; --nav:rgba(251,251,253,.78);
+  --u1:#0a8f7a; --u2:#0066cc; --u3:#cf4f0e;
+  --c1:#0071e3; --c2:#f56300; --c3:#0a9b80; --c4:#b4419a; --c5:#8a7a00;
+  --good:#1e9e4a; --bad:#d70015; --shadow:0 1px 2px rgba(0,0,0,.04),0 8px 28px rgba(0,0,0,.06);
+  --font:Pretendard,"Pretendard Variable",-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Noto Sans KR",system-ui,sans-serif;
+  --mono:"JetBrains Mono",ui-monospace,Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#000000; --surface:#161618; --surface2:#232326; --fg:#f5f5f7; --muted:#a1a1a6; --line:rgba(255,255,255,.12); --grid:rgba(255,255,255,.08);
+  --accent:#2997ff; --accent-ink:#000000; --nav:rgba(0,0,0,.72);
+  --u1:#30c9a8; --u2:#2997ff; --u3:#ff8a3d;
+  --c1:#2997ff; --c2:#ff9f45; --c3:#34d1ad; --c4:#e57bd0; --c5:#d8c84a;
+  --good:#32d74b; --bad:#ff453a; --shadow:0 1px 2px rgba(0,0,0,.4),0 8px 28px rgba(0,0,0,.4); color-scheme:dark;
+}}
+:root[data-theme="dark"]{
+  --bg:#000000; --surface:#161618; --surface2:#232326; --fg:#f5f5f7; --muted:#a1a1a6; --line:rgba(255,255,255,.12); --grid:rgba(255,255,255,.08);
+  --accent:#2997ff; --accent-ink:#000000; --nav:rgba(0,0,0,.72);
+  --u1:#30c9a8; --u2:#2997ff; --u3:#ff8a3d;
+  --c1:#2997ff; --c2:#ff9f45; --c3:#34d1ad; --c4:#e57bd0; --c5:#d8c84a;
+  --good:#32d74b; --bad:#ff453a; --shadow:0 1px 2px rgba(0,0,0,.4),0 8px 28px rgba(0,0,0,.4); color-scheme:dark;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:72px}
+body{background:var(--bg);color:var(--fg);font-family:var(--font);font-size:17px;line-height:1.6;letter-spacing:-.01em;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:60;background:var(--nav)}
+a{color:var(--accent);text-decoration:none}
+a:hover{text-decoration:underline}
+button{font:inherit;color:inherit}
+:focus-visible{outline:3px solid color-mix(in srgb,var(--accent) 55%,transparent);outline-offset:2px;border-radius:8px}
+h1,h2,h3{text-wrap:balance;letter-spacing:-.035em;line-height:1.12;margin:0}
+p{margin:0}
+.wrap{max-width:1080px;margin:0 auto;padding-left:max(20px,env(safe-area-inset-left,0px));padding-right:max(20px,env(safe-area-inset-right,0px))}
+
+/* nav */
+.nav{position:sticky;top:env(safe-area-inset-top,0px);z-index:50;background:var(--nav);backdrop-filter:saturate(180%) blur(20px);-webkit-backdrop-filter:saturate(180%) blur(20px);border-bottom:1px solid var(--line)}
+.nav .wrap{display:flex;align-items:center;gap:20px;height:52px}
+.brand{display:flex;align-items:center;gap:10px;font-weight:700;font-size:15px;color:var(--fg);letter-spacing:-.02em;white-space:nowrap}
+.brand:hover{text-decoration:none}
+.brand i{width:24px;height:24px;border-radius:7px;background:conic-gradient(from 200deg,var(--u1),var(--u2),var(--u3),var(--u1));display:block}
+.brand small{font-weight:500;color:var(--muted);font-size:13px}
+.nav nav{margin-left:auto;display:flex;gap:4px}
+.nav nav a{font-size:13px;color:var(--fg);opacity:.8;padding:6px 10px;border-radius:999px;white-space:nowrap}
+.nav nav a:hover{opacity:1;text-decoration:none;background:var(--surface2)}
+.nav nav a.on{opacity:1;font-weight:600}
+@media (max-width:560px){.brand small{display:none}.nav nav a{padding:6px 7px}}
+
+/* buttons & controls */
+.btn{display:inline-flex;align-items:center;gap:6px;border:0;border-radius:999px;padding:11px 20px;font-size:15px;font-weight:600;cursor:pointer;background:var(--accent);color:var(--accent-ink);transition:transform .15s,filter .15s}
+.btn:hover{text-decoration:none;filter:brightness(1.08)}
+.btn:active{transform:scale(.97)}
+.btn.ghost{background:transparent;color:var(--accent);box-shadow:inset 0 0 0 1.5px var(--accent)}
+.btn.soft{background:var(--surface2);color:var(--fg)}
+.btn.sm{padding:7px 14px;font-size:13px}
+.seg{display:inline-flex;background:var(--surface2);border-radius:11px;padding:3px;gap:2px;flex-wrap:wrap}
+.seg-b{border:0;background:transparent;border-radius:8px;padding:6px 14px;font-size:14px;font-weight:500;cursor:pointer;color:var(--muted);transition:background .2s,color .2s}
+.seg-b.on{background:var(--surface);color:var(--fg);box-shadow:0 1px 3px rgba(0,0,0,.12)}
+.sl{display:grid;grid-template-columns:1fr auto;gap:2px 12px;align-items:center;font-size:14px;min-width:0}
+.sl-l{color:var(--muted)}
+.sl output{font-variant-numeric:tabular-nums;font-weight:600}
+.sl input{grid-column:1/-1;width:100%;accent-color:var(--accent);margin:4px 0}
+.chip{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:600;padding:4px 10px;border-radius:999px;background:var(--surface2);color:var(--muted);letter-spacing:0}
+.eyebrow{font-size:13px;font-weight:600;color:var(--muted);letter-spacing:.02em}
+
+/* hero */
+.hero{padding-block:72px 40px;text-align:center}
+.hero .eyebrow{display:inline-block;margin-bottom:18px}
+.hero h1{font-size:clamp(40px,7.4vw,84px);font-weight:800}
+.grad{background:linear-gradient(100deg,var(--u1) 10%,var(--u2) 55%,var(--u3) 95%);-webkit-background-clip:text;background-clip:text;color:transparent}
+.hero .lead{font-size:clamp(17px,2.2vw,21px);color:var(--muted);max-width:640px;margin:22px auto 0;line-height:1.55}
+.hero .cta{display:flex;gap:12px;justify-content:center;margin-top:30px;flex-wrap:wrap}
+.hero h1,.hero .lead,.hero .cta{animation:rise .9s cubic-bezier(.2,.7,.2,1) both}
+.hero .lead{animation-delay:.08s}.hero .cta{animation-delay:.16s}
+@keyframes rise{from{transform:translateY(14px)}to{transform:none}}
+.stage{margin-top:48px;background:var(--surface);border-radius:28px;box-shadow:var(--shadow);border:1px solid var(--line);overflow:hidden;text-align:left}
+.stage-bar{display:flex;align-items:center;gap:12px;padding:14px 16px;border-bottom:1px solid var(--line);flex-wrap:wrap}
+.stage-bar .read{margin-left:auto;font-size:13px;color:var(--muted);font-variant-numeric:tabular-nums}
+.stage canvas{display:block;width:100%;cursor:crosshair;touch-action:manipulation}
+.stage-cap{padding:12px 16px;font-size:13px;color:var(--muted);border-top:1px solid var(--line)}
+
+/* sections */
+.sec{padding-block:64px}
+.sec-h{display:flex;align-items:end;justify-content:space-between;gap:16px;margin-bottom:28px;flex-wrap:wrap}
+.sec-h h2{font-size:clamp(30px,4.4vw,48px);font-weight:800}
+.sec-h p{color:var(--muted);max-width:460px}
+.progress{display:flex;align-items:center;gap:14px;background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:12px 18px}
+.progress svg{flex:none}
+.progress b{font-size:20px;font-variant-numeric:tabular-nums}
+.progress span{font-size:13px;color:var(--muted);display:block;line-height:1.3}
+
+.unit{margin-top:40px}
+.unit-h{display:flex;align-items:baseline;gap:12px;margin-bottom:16px;flex-wrap:wrap}
+.unit-h .no{font-size:14px;font-weight:700;color:var(--uc)}
+.unit-h h3{font-size:24px;font-weight:700}
+.unit-h span{color:var(--muted);font-size:15px}
+.cards{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}
+@media (max-width:900px){.cards{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:460px){.cards{grid-template-columns:1fr}}
+.lcard{position:relative;display:flex;flex-direction:column;gap:6px;min-height:200px;padding:22px;border-radius:22px;background:var(--surface);border:1px solid var(--line);color:var(--fg);transition:transform .25s cubic-bezier(.2,.7,.2,1),box-shadow .25s}
+.lcard:hover{text-decoration:none;transform:translateY(-3px);box-shadow:var(--shadow)}
+.lcard .n{font-size:44px;font-weight:800;letter-spacing:-.05em;line-height:1;color:var(--uc);font-variant-numeric:tabular-nums}
+.lcard h4{margin:auto 0 0;font-size:19px;font-weight:700;letter-spacing:-.03em;line-height:1.3}
+.lcard p{font-size:14px;color:var(--muted);line-height:1.45}
+.lcard .lab{font-size:12px;font-weight:600;color:var(--uc);margin-top:6px}
+.lcard .done{position:absolute;top:18px;right:18px;width:24px;height:24px;border-radius:50%;background:var(--uc);color:var(--surface);display:grid;place-items:center;font-size:13px;font-weight:800}
+
+.bento{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:14px}
+.tile{grid-column:span 2;padding:26px;border-radius:24px;background:var(--surface);border:1px solid var(--line);color:var(--fg);display:flex;flex-direction:column;gap:8px;min-width:0}
+.tile:hover{text-decoration:none;box-shadow:var(--shadow)}
+.tile.w3{grid-column:span 3}
+.tile h4{margin:0;font-size:22px;letter-spacing:-.03em;line-height:1.25}
+.tile p{color:var(--muted);font-size:15px}
+.tile .go{margin-top:auto;font-size:14px;font-weight:600;color:var(--accent)}
+.tile.dark{background:var(--fg);color:var(--bg);border-color:transparent}
+.tile.dark p{color:color-mix(in srgb,var(--bg) 70%,var(--fg))}
+.tile.dark .go{color:var(--bg)}
+@media (max-width:820px){.tile,.tile.w3{grid-column:span 3}}
+@media (max-width:560px){.bento{grid-template-columns:1fr}.tile,.tile.w3{grid-column:auto}}
+.links{display:flex;flex-wrap:wrap;gap:8px;margin-top:6px}
+.links a{font-size:13px;padding:6px 12px;border-radius:999px;background:var(--surface2);color:var(--fg)}
+.tile.dark .links a{background:color-mix(in srgb,var(--bg) 16%,var(--fg));color:var(--bg)}
+
+/* lesson page */
+.lhero{padding-block:56px 28px}
+.crumb{font-size:14px;color:var(--muted);display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.crumb b{color:var(--uc)}
+.lhero h1{font-size:clamp(36px,6vw,64px);font-weight:800;margin-top:14px}
+.lhero .tag{font-size:clamp(18px,2.4vw,24px);color:var(--muted);margin-top:12px;letter-spacing:-.02em}
+.goals{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-top:32px}
+.goal{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:18px;font-size:15px;line-height:1.5;min-width:0}
+.goal b{display:block;font-size:12px;color:var(--uc);margin-bottom:6px;letter-spacing:.02em}
+@media (max-width:720px){.goals{grid-template-columns:1fr}}
+.block{padding-block:36px}
+.block>h2{font-size:clamp(26px,3.4vw,36px);font-weight:800;margin-bottom:18px}
+.prose{max-width:720px;display:grid;gap:16px}
+.prose p,.prose li{font-size:17px;line-height:1.75}
+.prose strong{color:var(--fg)}
+.prose ul{margin:0;padding-left:1.2em;display:grid;gap:6px}
+.flow{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:4px 0}
+.flow span{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:8px 12px;font-size:14px;font-weight:600}
+.flow span em{font-style:normal;color:var(--uc);margin-right:6px;font-variant-numeric:tabular-nums}
+.flow i{color:var(--muted);font-style:normal}
+.tbl{overflow-x:auto;border:1px solid var(--line);border-radius:14px;background:var(--surface)}
+.tbl table{border-collapse:collapse;width:100%;font-size:14px;font-variant-numeric:tabular-nums}
+.tbl th,.tbl td{padding:9px 12px;text-align:left;border-bottom:1px solid var(--line);white-space:nowrap}
+.tbl th{font-weight:600;color:var(--muted);font-size:12px;background:var(--surface2)}
+.tbl tr:last-child td{border-bottom:0}
+.tbl td.wrap{white-space:normal;min-width:220px}
+.formula{font-family:var(--mono);font-size:14px;background:var(--surface2);border-radius:12px;padding:12px 14px;overflow-x:auto;white-space:pre}
+.keys{display:flex;flex-wrap:wrap;gap:8px}
+.keys span{font-size:13px;padding:5px 12px;border-radius:999px;border:1px solid var(--line);color:var(--muted)}
+
+.labcard{background:var(--surface);border:1px solid var(--line);border-radius:28px;box-shadow:var(--shadow);overflow:hidden}
+.lab-h{padding:22px 24px 0;display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;align-items:flex-start}
+.lab-h h3{font-size:22px;font-weight:700}
+.lab-h p{color:var(--muted);font-size:14px;margin-top:4px;max-width:560px}
+.lab-b{padding:20px 24px 24px;display:grid;gap:18px}
+.ctrls{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px 22px;align-items:end}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px}
+.stat{background:var(--surface2);border-radius:14px;padding:12px 14px;min-width:0}
+.stat span{display:block;font-size:12px;color:var(--muted)}
+.stat b{font-size:22px;font-weight:700;letter-spacing:-.02em;font-variant-numeric:tabular-nums}
+.stat.hi{background:color-mix(in srgb,var(--uc) 14%,var(--surface))}
+.stat.hi b{color:var(--uc)}
+.plot{width:100%;border-radius:16px;background:var(--surface2);overflow:hidden}
+.plot canvas{display:block;width:100%}
+.note{font-size:13px;color:var(--muted)}
+.msg{font-size:15px;padding:12px 14px;border-radius:14px;background:var(--surface2)}
+.msg.good{background:color-mix(in srgb,var(--good) 14%,var(--surface));}
+.msg.bad{background:color-mix(in srgb,var(--bad) 12%,var(--surface));}
+
+.qgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px}
+.qc{background:var(--surface2);border-radius:18px;padding:16px;display:flex;flex-direction:column;gap:12px;min-width:0}
+.qc p{font-weight:600;font-size:16px;line-height:1.45}
+.qc .row .btn{flex:1;justify-content:center}
+.qc .fb{font-size:14px;line-height:1.5}
+.qc.ok{box-shadow:inset 0 0 0 2px var(--good)}
+.qc.no{box-shadow:inset 0 0 0 2px var(--bad)}
+.qc .fb b{display:block}
+
+.json{font-family:var(--mono);font-size:12.5px;line-height:1.65;background:var(--surface2);border-radius:14px;padding:14px;overflow:auto;max-height:340px;white-space:pre}
+.json .k{color:var(--c4)} .json .s{color:var(--c3)} .json .blk{border-radius:6px;transition:background .2s;display:inline}
+.json .blk.hl{background:color-mix(in srgb,var(--accent) 18%,transparent)}
+tr.hl td{background:color-mix(in srgb,var(--accent) 12%,transparent)}
+tr.top td{background:color-mix(in srgb,var(--c2) 16%,transparent)}
+
+.cells{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:8px}
+@media (max-width:520px){.cells{grid-template-columns:repeat(4,minmax(0,1fr))}}
+.cell{background:var(--surface2);border-radius:12px;padding:8px;text-align:center;font-variant-numeric:tabular-nums}
+.cell span{display:block;font-size:11px;color:var(--muted)}
+.cell b{font-size:17px}
+.cell.miss b{color:var(--muted)}
+.cell.out{box-shadow:inset 0 0 0 2px var(--c2)}
+.cell.gone{opacity:.35;text-decoration:line-through}
+.cell.fill b{color:var(--accent);font-style:italic}
+
+.cm{display:grid;grid-template-columns:auto 1fr 1fr;gap:6px;font-size:13px;max-width:420px}
+.cm div{border-radius:12px;padding:10px;text-align:center}
+.cm .h{color:var(--muted);font-weight:600;align-self:center}
+.cm .v{background:var(--surface2);font-variant-numeric:tabular-nums}
+.cm .v b{display:block;font-size:24px}
+.cm .v.t{background:color-mix(in srgb,var(--good) 16%,var(--surface))}
+.cm .v.f{background:color-mix(in srgb,var(--bad) 13%,var(--surface))}
+
+.split{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr);gap:18px;align-items:start}
+@media (max-width:760px){.split{grid-template-columns:1fr}}
+
+.prompt{position:relative;background:var(--surface);border:1px solid var(--line);border-radius:20px;overflow:hidden}
+.prompt-h{display:flex;justify-content:space-between;align-items:center;padding:12px 16px;border-bottom:1px solid var(--line);font-size:13px;color:var(--muted);font-weight:600}
+.prompt pre{margin:0;padding:16px;font-family:var(--mono);font-size:13.5px;line-height:1.7;white-space:pre-wrap;word-break:keep-all;overflow-wrap:anywhere}
+.think{display:grid;gap:10px;max-width:720px}
+.think li{list-style:none;background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:14px 16px;font-size:16px}
+.think{padding:0;margin:0}
+.pager{display:flex;gap:12px;justify-content:space-between;flex-wrap:wrap;padding-block:24px 64px;border-top:1px solid var(--line);margin-top:24px;align-items:center}
+.pager a{display:flex;flex-direction:column;font-size:13px;color:var(--muted);min-width:0}
+.pager a b{font-size:17px;color:var(--fg)}
+.pager a:hover{text-decoration:none}
+.pager a:hover b{color:var(--accent)}
+
+.search{width:100%;max-width:420px;font:inherit;font-size:16px;padding:12px 16px;border-radius:14px;border:1px solid var(--line);background:var(--surface);color:var(--fg)}
+.gl{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px;margin-top:20px}
+.gi{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:16px 18px;min-width:0}
+.gi h4{margin:0 0 4px;font-size:17px;letter-spacing:-.02em}
+.gi p{font-size:14.5px;color:var(--muted);line-height:1.55}
+.gi a{font-size:12px;font-weight:600}
+.steps{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+@media (max-width:760px){.steps{grid-template-columns:1fr}}
+.step{background:var(--surface);border:1px solid var(--line);border-radius:20px;padding:20px;min-width:0}
+.step em{font-style:normal;font-weight:800;font-size:28px;color:var(--accent);letter-spacing:-.04em}
+.step h4{margin:6px 0;font-size:18px}
+.step p{font-size:14.5px;color:var(--muted)}
+.check{display:grid;gap:8px;max-width:720px}
+.check label{display:flex;gap:12px;align-items:flex-start;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:12px 14px;cursor:pointer;font-size:15.5px}
+.check input{width:20px;height:20px;accent-color:var(--accent);margin-top:2px;flex:none}
+footer{border-top:1px solid var(--line);padding-block:28px 40px;font-size:12px;color:var(--muted)}
+footer .wrap{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
+</style>
+
+<a class="sr" href="#app" style="position:absolute;left:-999px">본문 바로가기</a>
+<header class="nav">
+  <div class="wrap">
+    <a class="brand" href="#home"><i></i>경북여고 정보 <small>데이터 · 인공지능</small></a>
+    <nav aria-label="주 메뉴">
+      <a href="#units" data-nav="units">수업</a>
+      <a href="#labs" data-nav="labs">실험실</a>
+      <a href="#glossary" data-nav="glossary">용어사전</a>
+      <a href="#project" data-nav="project">프로젝트</a>
+    </nav>
+  </div>
+</header>
+<main id="app"></main>
+<footer><div class="wrap"><span>경북여자고등학교 · 정보 · 데이터와 인공지능 · 2026</span><span>실험실의 데이터는 수업을 위해 만든 예시 값입니다.</span></div></footer>
+
+<script>
+/* ---------- 기본 도구 ---------- */
+const $=(s,r=document)=>r.querySelector(s);
+function h(tag,attrs,...kids){const e=document.createElement(tag);for(const [k,v] of Object.entries(attrs||{})){if(k==='class')e.className=v;else if(k==='html')e.innerHTML=v;else if(k==='style')e.style.cssText=v;else if(k.startsWith('on'))e.addEventListener(k.slice(2),v);else if(v!==false&&v!=null)e.setAttribute(k,v===true?'':v);}for(const k of kids.flat()){if(k==null||k===false)continue;e.append(k.nodeType?k:document.createTextNode(k));}return e;}
+const C=n=>getComputedStyle(document.documentElement).getPropertyValue('--'+n).trim();
+const FONT=()=>getComputedStyle(document.body).fontFamily;
+function rng(seed){return function(){seed|=0;seed=seed+0x6D2B79F5|0;let t=Math.imul(seed^seed>>>15,1|seed);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;};}
+function gauss(r){let u=0,v=0;while(!u)u=r();while(!v)v=r();return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v);}
+const fx=(v,d=1)=>(Math.round(v*10**d)/10**d).toFixed(d);
+const sgn=(v,d=2)=>(v>=0?'+':'−')+fx(Math.abs(v),d);
+function lsq(pts){const n=pts.length,mx=pts.reduce((s,p)=>s+p[0],0)/n,my=pts.reduce((s,p)=>s+p[1],0)/n;let sxy=0,sxx=0,syy=0;for(const [x,y] of pts){sxy+=(x-mx)*(y-my);sxx+=(x-mx)**2;syy+=(y-my)**2;}const a=sxy/sxx;return{a,b:my-a*mx,r:sxy/Math.sqrt(sxx*syy),mx,my};}
+const store={get(k,d){try{const v=localStorage.getItem(k);return v?JSON.parse(v):d;}catch(e){return d;}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v));}catch(e){}}};
+
+const redrawers=new Set();
+function plot(parent,ratio,maxH,draw){
+  const wrap=h('div',{class:'plot'});const c=h('canvas');wrap.append(c);parent.append(wrap);
+  const ctx=c.getContext('2d');const api={canvas:c,W:0,H:0};
+  api.redraw=()=>{const w=wrap.clientWidth;if(!w)return;const hh=Math.round(Math.min(w*ratio,maxH));const d=window.devicePixelRatio||1;if(c.width!==Math.round(w*d)||c.height!==Math.round(hh*d)){c.width=Math.round(w*d);c.height=Math.round(hh*d);c.style.height=hh+'px';}ctx.setTransform(d,0,0,d,0,0);api.W=w;api.H=hh;ctx.clearRect(0,0,w,hh);draw(ctx,w,hh);};
+  new ResizeObserver(api.redraw).observe(wrap);redrawers.add(api.redraw);return api;
+}
+function frame(ctx,W,H,o){
+  const p={l:o.l??46,r:o.r??16,t:o.t??16,b:o.b??34};
+  const X=v=>p.l+(v-o.x0)/(o.x1-o.x0)*(W-p.l-p.r), Y=v=>H-p.b-(v-o.y0)/(o.y1-o.y0)*(H-p.t-p.b);
+  ctx.font='12px '+FONT();ctx.lineWidth=1;ctx.strokeStyle=C('grid');ctx.fillStyle=C('muted');
+  ctx.textAlign='center';ctx.textBaseline='top';
+  (o.xt||[]).forEach(v=>{const x=X(v);ctx.beginPath();ctx.moveTo(x,p.t);ctx.lineTo(x,H-p.b);ctx.stroke();ctx.fillText(o.xf?o.xf(v):v,x,H-p.b+9);});
+  ctx.textAlign='right';ctx.textBaseline='middle';
+  (o.yt||[]).forEach(v=>{const y=Y(v);ctx.beginPath();ctx.moveTo(p.l,y);ctx.lineTo(W-p.r,y);ctx.stroke();ctx.fillText(o.yf?o.yf(v):v,p.l-8,y);});
+  ctx.font='600 12px '+FONT();
+  if(o.xl){ctx.textAlign='right';ctx.textBaseline='bottom';ctx.fillText(o.xl,W-p.r-2,H-p.b-4);}
+  if(o.yl){ctx.textAlign='left';ctx.textBaseline='top';ctx.fillText(o.yl,p.l+6,p.t+2);}
+  return{X,Y,p,ix:x=>o.x0+(x-p.l)/(W-p.l-p.r)*(o.x1-o.x0),iy:y=>o.y0+(H-p.b-y)/(H-p.t-p.b)*(o.y1-o.y0)};
+}
+function dot(ctx,x,y,r,fill,stroke,lw=2){ctx.beginPath();ctx.arc(x,y,r,0,Math.PI*2);if(fill){ctx.fillStyle=fill;ctx.fill();}if(stroke){ctx.strokeStyle=stroke;ctx.lineWidth=lw;ctx.stroke();}}
+function alpha(col,a){return `color-mix(in srgb, ${col} ${Math.round(a*100)}%, transparent)`;}
+function seg(options,value,onChange){const g=h('div',{class:'seg',role:'group'});options.forEach(([v,label])=>{const b=h('button',{type:'button',class:'seg-b'+(v===value?' on':''),'aria-pressed':String(v===value)},label);b.addEventListener('click',()=>{g.querySelectorAll('.seg-b').forEach(x=>{x.classList.remove('on');x.setAttribute('aria-pressed','false');});b.classList.add('on');b.setAttribute('aria-pressed','true');onChange(v);});g.append(b);});return g;}
+function slider(id,label,min,max,step,val,fmt,onInput){const out=h('output',{for:id});const inp=h('input',{type:'range',id,min,max,step,value:val});const set=()=>{out.textContent=fmt(+inp.value);};inp.addEventListener('input',()=>{set();onInput(+inp.value);});set();const row=h('label',{class:'sl',for:id},h('span',{class:'sl-l'},label),out,inp);row.setVal=v=>{inp.value=v;set();};return row;}
+function stat(label,hi){const b=h('b',null,'–');const e=h('div',{class:'stat'+(hi?' hi':'')},h('span',null,label),b);e.set=v=>{b.textContent=v;};return e;}
+
+/* ---------- 차시 데이터 ---------- */
+const UNITS=[
+  {id:'u1',no:'Ⅰ',name:'데이터 수집과 관리',sub:'질문을 세우고, 데이터를 모으고, 다듬어 보여 주기',range:[1,4]},
+  {id:'u2',no:'Ⅱ',name:'기계학습으로 예측하기',sub:'데이터에서 규칙을 배우는 모델을 만들고 평가하기',range:[5,8]},
+  {id:'u3',no:'Ⅲ',name:'평가·발견·책임',sub:'모델을 믿을 수 있는지 따지고, 사회 속 AI를 생각하기',range:[9,12]},
+];
+const L=[
+{n:1,u:'u1',title:'질문으로 시작하는 데이터 분석',tag:'좋은 질문이 모을 데이터와 계산 방법을 정한다',lab:'q',labTitle:'질문 감별소',labHint:'각 질문이 데이터로 답할 수 있는 질문인지 판단해 보세요.',
+goals:['데이터 분석의 6단계를 순서대로 말할 수 있다.','데이터로 답할 수 있는 질문과 없는 질문을 구별할 수 있다.','막연한 질문을 측정할 수 있는 질문으로 다듬을 수 있다.'],
+concept:`<p>데이터 분석은 질문에서 시작합니다. "급식이 맛있을까?"라는 질문은 무엇을 모아야 할지 알려 주지 않습니다. "11월 급식 만족도 설문에서 메뉴별 평균 점수는 몇 점일까?"로 다듬으면 모을 데이터와 계산 방법이 함께 정해집니다.</p>
+<div class="flow"><span><em>1</em>문제 정의</span><i>›</i><span><em>2</em>데이터 수집</span><i>›</i><span><em>3</em>전처리</span><i>›</i><span><em>4</em>분석</span><i>›</i><span><em>5</em>시각화</span><i>›</i><span><em>6</em>해석과 공유</span></div>
+<p>좋은 질문에는 세 가지 조건이 있습니다.</p>
+<ul><li><strong>측정할 수 있다</strong> — 숫자나 범주로 기록할 수 있는 값을 묻는다.</li><li><strong>범위가 정해져 있다</strong> — 누구를, 언제, 어디서 조사하는지 분명하다.</li><li><strong>확인할 데이터가 있다</strong> — 설문, 공공데이터, 관찰로 실제로 모을 수 있다.</li></ul>`,
+keys:['데이터 분석 6단계','측정 가능성','조사 범위'],
+prompt:`우리 학교 생활과 관련해 데이터로 답할 수 있는 질문 10개를 만들어 줘.
+질문마다 필요한 데이터, 모으는 방법(설문 / 공공데이터 / 관찰), 어울리는 그래프 종류를 표로 정리해 줘.
+그리고 막연한 질문 3개를 예로 들고, 측정할 수 있는 질문으로 어떻게 고치는지 보여 줘.
+대상은 대구에 있는 여자고등학교 학생이야.`,
+think:['내가 정말 궁금한 학교 생활 질문 하나를 적고, 그 질문에 답하려면 어떤 데이터가 필요한지 적어 봅시다.','그 데이터를 모으는 과정에서 친구의 개인정보가 드러날 수 있는 부분은 어디인가요?']},
+{n:2,u:'u1',title:'데이터 수집과 구조화',tag:'API로 급식 데이터를 받아 표로 읽기',lab:'json',labTitle:'JSON ↔ 표 변환기',labHint:'급식 API 응답(JSON)과 표가 어떻게 대응하는지 살펴보세요. 표의 행에 마우스를 올리면 JSON의 해당 부분이 표시됩니다.',
+goals:['정형·반정형·비정형 데이터를 구분할 수 있다.','API 요청과 JSON 응답의 구조를 설명할 수 있다.','JSON 데이터를 행과 열로 바꿔 질문에 답할 수 있다.'],
+concept:`<p>표처럼 행과 열이 정해진 데이터를 <strong>정형 데이터</strong>, JSON처럼 이름표(키)가 붙어 구조는 있지만 모양이 자유로운 데이터를 <strong>반정형 데이터</strong>, 사진·글·음성처럼 정해진 틀이 없는 데이터를 <strong>비정형 데이터</strong>라고 합니다.</p>
+<p><strong>API</strong>는 프로그램끼리 데이터를 주고받는 약속입니다. 나이스 교육정보 개방 포털의 급식식단정보 API에 교육청 코드(대구는 <code>D10</code>), 학교 코드, 날짜를 넣어 요청하면 JSON 응답이 돌아옵니다.</p>
+<div class="formula">https://open.neis.go.kr/hub/mealServiceDietInfo
+  ?Type=json &amp;ATPT_OFCDC_SC_CODE=D10 &amp;SD_SCHUL_CODE=(학교코드)
+  &amp;MLSV_FROM_YMD=20261102 &amp;MLSV_TO_YMD=20261106</div>
+<p>JSON의 <code>row</code> 목록에서 항목 하나가 표의 한 행(하루)이 되고, 각 키(<code>MLSV_YMD</code>, <code>DDISH_NM</code>, <code>CAL_INFO</code>)가 열이 됩니다.</p>`,
+keys:['정형·반정형·비정형','API','JSON 키-값','행과 열'],
+prompt:`나이스 교육정보 개방 포털의 급식식단정보 API로 우리 학교 이번 달 중식 메뉴를 가져오는 스트림릿 앱을 main.py 하나로 만들어 줘.
+교육청 코드는 D10이고, 학교 코드와 인증키는 사이드바에서 입력받아.
+응답 JSON에서 날짜(MLSV_YMD), 메뉴(DDISH_NM), 열량(CAL_INFO)을 꺼내 표로 보여 줘.
+메뉴의 <br/>은 쉼표로 바꾸고, 괄호 속 알레르기 번호는 지워 줘.
+열량이 가장 높은 날과 가장 낮은 날을 색으로 강조해 줘.
+requirements.txt도 버전 숫자 없이 같이 줘.`,
+think:['급식 데이터로 답할 수 있는 질문을 두 개 만들어 봅시다. (예: 이번 달 가장 자주 나온 반찬은?)','API로 받은 데이터와 직접 설문으로 모은 데이터는 믿을 수 있는 정도가 어떻게 다를까요?']},
+{n:3,u:'u1',title:'데이터 전처리',tag:'결측치와 이상치를 다루는 기준 세우기',lab:'clean',labTitle:'수면 시간 데이터 정리하기',labHint:'우리 반 12명의 하루 수면 시간 설문(예시)입니다. 처리 방법을 바꾸며 평균과 중앙값이 어떻게 달라지는지 확인하세요.',
+goals:['데이터에서 결측치와 이상치를 찾을 수 있다.','처리 방법에 따라 분석 결과가 달라지는 것을 비교할 수 있다.','처리 기준을 분석 전에 정하고 기록할 수 있다.'],
+concept:`<p>모은 데이터는 대개 그대로 쓸 수 없습니다. 비어 있는 값을 <strong>결측치</strong>, 다른 값들과 동떨어진 값을 <strong>이상치</strong>라고 합니다. 이상치는 입력 실수일 수도 있고 진짜 특이한 값일 수도 있어서, 무조건 지우면 안 됩니다.</p>
+<div class="tbl"><table><thead><tr><th>방법</th><th>하는 일</th><th>주의할 점</th></tr></thead><tbody>
+<tr><td>삭제</td><td>문제가 있는 행을 뺀다</td><td class="wrap">데이터 수가 줄고, 특정 집단만 빠질 수 있다</td></tr>
+<tr><td>평균·중앙값 대체</td><td>빈칸을 대표값으로 채운다</td><td class="wrap">값이 한가운데로 몰려 퍼짐이 작아 보인다</td></tr>
+<tr><td>0 등 임의 값</td><td>빈칸을 정해진 값으로 채운다</td><td class="wrap">0이 실제 값처럼 계산되어 평균을 왜곡한다</td></tr></tbody></table></div>
+<p>평균은 이상치 하나에도 크게 흔들리지만, 중앙값은 덜 흔들립니다. 가장 중요한 원칙은 <strong>결과를 보기 전에 기준을 정하는 것</strong>입니다. 원하는 결론이 나오도록 값을 골라 지우면 분석이 아니라 조작이 됩니다.</p>`,
+keys:['결측치','이상치','평균과 중앙값','처리 기준 기록'],
+prompt:`CSV 파일을 올리면 전처리를 도와주는 스트림릿 앱을 main.py 하나로 만들어 줘.
+1. 열마다 결측치 개수를 표로 보여 줘.
+2. 숫자 열을 하나 고르면 상자그림을 그리고, 사분위 범위(IQR) 기준으로 이상치를 표시해 줘.
+3. 결측치는 '행 삭제 / 평균 대체 / 중앙값 대체' 중에서, 이상치는 '그대로 / 삭제' 중에서 고르게 해 줘.
+4. 처리 전과 후의 평균, 중앙값, 데이터 개수를 나란히 비교해 줘.
+5. 내가 고른 처리 기준을 문장으로 요약해서 화면 아래에 보여 줘.
+그래프는 plotly로, requirements.txt도 같이 줘.`,
+think:['수면 시간 0.5시간은 입력 실수일까요, 밤을 새운 학생의 실제 값일까요? 어떻게 확인할 수 있을까요?','결측치를 0으로 채우면 왜 평균이 크게 내려가는지 설명해 봅시다.']},
+{n:4,u:'u1',title:'데이터 시각화',tag:'질문에 맞는 그래프 고르기',lab:'chart',labTitle:'그래프 고르기',labHint:'질문을 고르고, 그 질문에 가장 잘 맞는 그래프 종류를 선택해 보세요.',
+goals:['변화·비교·구성·관계 질문에 맞는 그래프를 고를 수 있다.','그래프에 축 이름, 단위, 출처를 빠짐없이 표시할 수 있다.','잘못 고른 그래프가 어떤 오해를 만드는지 설명할 수 있다.'],
+concept:`<p>그래프는 질문에 대한 답을 한눈에 보여 주는 도구입니다. 같은 데이터라도 무엇을 묻느냐에 따라 알맞은 그래프가 달라집니다.</p>
+<div class="tbl"><table><thead><tr><th>질문의 종류</th><th>알맞은 그래프</th><th>예시</th></tr></thead><tbody>
+<tr><td>시간에 따른 변화</td><td>꺾은선 그래프</td><td class="wrap">월별 도서관 대출 권수</td></tr>
+<tr><td>항목끼리 비교</td><td>막대그래프</td><td class="wrap">반별 봉사 시간</td></tr>
+<tr><td>전체 중 비율</td><td>원그래프 · 누적 막대</td><td class="wrap">희망 진로 분야 비율</td></tr>
+<tr><td>두 변수의 관계</td><td>산점도</td><td class="wrap">스마트폰 사용 시간과 수면 시간</td></tr>
+<tr><td>값의 분포</td><td>히스토그램 · 상자그림</td><td class="wrap">50m 달리기 기록 분포</td></tr></tbody></table></div>
+<p>세로축을 0이 아닌 값에서 시작하면 작은 차이가 크게 보입니다. 축 이름과 단위, 데이터 출처를 꼭 적어 읽는 사람이 오해하지 않게 합니다.</p>`,
+keys:['꺾은선','막대','원','산점도','축과 단위'],
+prompt:`'그래프 도감' 스트림릿 앱을 main.py 하나로 만들어 줘.
+탭을 4개 만들어 각각 변화(꺾은선), 비교(막대), 구성(원), 관계(산점도)를 보여 줘.
+데이터는 앱 안에 예시로 직접 만들어 줘: 월별 도서관 대출 권수, 반별 봉사 시간, 희망 진로 비율, 스마트폰 사용 시간과 수면 시간.
+탭마다 '이 그래프가 답하는 질문'을 한 문장으로 위에 적어 줘.
+막대그래프 탭에는 '세로축 0부터 시작' 체크박스를 넣어, 끄면 차이가 얼마나 과장되어 보이는지 비교하게 해 줘.
+plotly를 쓰고, requirements.txt도 같이 줘.`,
+think:['뉴스나 SNS에서 본 그래프 중 오해를 만들 수 있는 그래프를 찾아, 무엇이 문제인지 적어 봅시다.','원그래프가 항목이 10개 넘을 때 읽기 어려운 이유는 무엇일까요?']},
+{n:5,u:'u2',title:'인공지능과 기계학습',tag:'규칙을 짜는 대신 데이터에서 배우기',lab:'ml',labTitle:'학습 방법 분류하기',labHint:'각 사례가 지도학습, 비지도학습, 강화학습 중 무엇인지 골라 보세요.',
+goals:['규칙 기반 프로그램과 기계학습의 차이를 설명할 수 있다.','지도·비지도·강화학습을 예시로 구분할 수 있다.','특성(입력)과 레이블(정답)을 구분할 수 있다.'],
+concept:`<p>전통적인 프로그램은 사람이 규칙을 직접 적습니다. 기계학습은 데이터와 정답을 주면 컴퓨터가 규칙을 찾아냅니다. 이렇게 찾은 규칙을 <strong>모델</strong>, 찾는 과정을 <strong>학습</strong>이라고 합니다.</p>
+<div class="formula">전통 프로그래밍 :  규칙 + 데이터   →  답
+기계학습       :  데이터 + 답     →  규칙(모델)</div>
+<ul><li><strong>지도학습</strong> — 정답(레이블)이 붙은 데이터로 학습합니다. 수치를 예측하면 <em>회귀</em>, 범주를 고르면 <em>분류</em>입니다.</li>
+<li><strong>비지도학습</strong> — 정답 없이 데이터 안의 구조를 찾습니다. 비슷한 것끼리 묶는 <em>군집</em>이 대표적입니다.</li>
+<li><strong>강화학습</strong> — 행동하고 받은 보상을 바탕으로 더 좋은 행동 전략을 익힙니다.</li></ul>
+<p>모델에 넣는 값을 <strong>특성</strong>, 맞혀야 할 값을 <strong>레이블</strong>이라고 합니다. 메일 스팸 필터라면 메일 속 단어가 특성, '스팸/정상'이 레이블입니다.</p>`,
+keys:['모델','학습','지도학습','비지도학습','강화학습','특성과 레이블'],
+prompt:`scikit-learn의 붓꽃(iris) 데이터로 지도학습과 비지도학습을 비교하는 스트림릿 앱을 main.py 하나로 만들어 줘.
+왼쪽에는 품종 레이블을 써서 학습한 의사결정나무의 정확도와 예측 결과 산점도를,
+오른쪽에는 레이블 없이 k-평균(k=3)으로 묶은 결과 산점도를 나란히 보여 줘.
+두 그래프의 축은 꽃잎 길이와 꽃잎 너비로 맞춰 줘.
+화면 아래에 '레이블을 썼는가 / 무엇을 출력하는가'를 비교하는 표를 넣어 줘.
+plotly를 쓰고 requirements.txt도 같이 줘.`,
+think:['내 휴대폰 속 기능 중 기계학습이 쓰였을 것 같은 기능 세 가지를 찾아, 어떤 학습 방법일지 추측해 봅시다.','규칙을 직접 짜는 편이 기계학습보다 나은 문제는 어떤 문제일까요?']},
+{n:6,u:'u2',title:'선형 회귀',tag:'대구는 얼마나 더워졌을까 — 데이터에 직선 긋기',lab:'reg',labTitle:'기온 추세선 맞추기',labHint:'기울기와 편향을 움직여 점들을 가장 잘 대표하는 직선을 찾아보세요. 빨간 선분이 오차입니다.',
+goals:['상관계수로 두 변수가 함께 변하는 정도를 읽을 수 있다.','회귀 직선을 기울기와 편향 두 수로 설명할 수 있다.','학습 범위 밖을 예측(외삽)할 때의 위험을 설명할 수 있다.'],
+concept:`<p>기온이나 성적처럼 <strong>수치</strong>를 예측하는 지도학습을 <strong>회귀</strong>라고 합니다. 연도와 연평균기온처럼 두 값의 관계를 직선 하나로 요약하는 방법이 <strong>단순 선형 회귀</strong>입니다.</p>
+<div class="formula">예측 기온 = 기울기 × (연도 − 1975) + 편향</div>
+<p><strong>기울기</strong>(가중치)는 연도가 1 늘 때 기온이 얼마나 변하는지, <strong>편향</strong>은 기준 연도(1975년)의 예측값입니다. 학습은 각 점의 오차(실제값 − 예측값)를 제곱해 더한 값이 가장 작아지는 기울기와 편향을 찾는 과정입니다.</p>
+<p><strong>상관계수 r</strong>은 −1에서 +1 사이의 값으로, 부호는 방향을, 절댓값은 직선에 가까운 정도를 나타냅니다. 상관이 있다고 해서 원인과 결과 관계가 있는 것은 아닙니다. 또 학습에 쓴 기간을 벗어난 미래를 예측하는 <strong>외삽</strong>은 직선이 계속 이어진다는 가정에 기대므로 조심해서 읽어야 합니다.</p>`,
+keys:['회귀','기울기·편향','제곱오차 합','상관계수','외삽'],
+prompt:`'대구 기온 예측기' 스트림릿 앱을 main.py 하나로 만들어 줘.
+기상자료개방포털에서 내려받은 대구(지점 번호 143) 일별 기온 CSV(daegu.csv)를 읽어 연도별 평균기온을 구해 줘.
+인코딩은 cp949일 수 있고, 열 이름이 다르면 먼저 df.columns를 화면에 출력해 확인하게 해 줘.
+관측일이 300일 미만인 해는 빼고, 사용한 해의 개수와 시작·끝 연도를 화면에 적어 줘.
+산점도, 상관계수, 회귀 직선을 plotly로 그려 줘.
+슬라이더로 연도(1950~2100)를 고르면 예상 기온을 크게 보여 주고, 학습 기간 밖이면 '외삽 주의' 경고를 띄워 줘.
+기울기를 '100년에 몇 ℃'로 바꿔 보여 주고, 최근 20년만으로 구한 기울기도 나란히 비교해 줘.
+requirements.txt도 같이 줘.`,
+think:['전체 기간과 최근 20년의 기울기가 다르다면, 어느 쪽으로 2050년을 예측해야 할까요? 근거를 함께 적어 봅시다.','"아이스크림 판매량과 물놀이 사고는 상관이 높다"는 말에서 숨은 원인은 무엇일까요?']},
+{n:7,u:'u2',title:'회귀 모델 평가',tag:'오차를 숫자 하나로 요약하기',lab:'metric',labTitle:'오차 지표 손계산',labHint:'공부 시간으로 점수를 예측하는 직선(예시)입니다. 직선을 바꾸면 표의 오차와 지표가 바로 다시 계산됩니다.',
+goals:['오차, MAE, MSE, RMSE를 직접 계산할 수 있다.','결정계수 R²의 의미를 설명할 수 있다.','지표마다 큰 오차를 다루는 방식이 다름을 비교할 수 있다.'],
+concept:`<p>모델이 얼마나 잘 맞는지 말하려면 오차를 숫자 하나로 요약해야 합니다. 오차는 <strong>실제값 − 예측값</strong>입니다.</p>
+<div class="formula">MAE  = 평균( |오차| )          → 평균적으로 몇 점 틀리나
+MSE  = 평균( 오차² )           → 큰 오차에 더 큰 벌점
+RMSE = √MSE                   → 단위를 원래대로(점)
+R²   = 1 − (오차² 합) / (편차² 합) → 평균으로 찍을 때보다 얼마나 나은가</div>
+<p>MAE는 이해하기 쉽고, MSE와 RMSE는 오차를 제곱하므로 크게 틀린 예측을 더 엄하게 평가합니다. <strong>R²</strong>는 1에 가까울수록 좋고, 0이면 모든 학생의 점수를 평균으로 찍은 것과 같은 수준입니다. 음수가 나오면 평균보다도 못한 모델입니다.</p>`,
+keys:['오차','MAE','MSE','RMSE','결정계수 R²'],
+prompt:`회귀 평가 지표를 계산해 보는 스트림릿 앱을 main.py 하나로 만들어 줘.
+표 편집기(st.data_editor)로 '공부 시간, 점수' 데이터를 직접 입력하게 하고, 처음에는 5행 예시를 넣어 줘.
+기울기와 편향 슬라이더로 직선을 바꾸면 행마다 예측값, 오차, |오차|, 오차²를 표로 보여 줘.
+그 아래에 MAE, MSE, RMSE, R²를 큰 숫자로 보여 주고, scikit-learn으로 계산한 값과 같은지도 확인해 줘.
+'최적 직선' 버튼을 누르면 최소제곱 직선으로 바꿔 줘.
+requirements.txt도 같이 줘.`,
+think:['한 학생의 예측만 30점 틀리고 나머지는 정확하다면, MAE와 RMSE 중 어느 지표가 더 크게 늘어날까요?','R²가 0.95라면 이 모델로 무엇이든 믿고 예측해도 될까요?']},
+{n:8,u:'u2',title:'분류 — k-최근접 이웃',tag:'가까운 이웃의 다수결로 정하기',lab:'knn',labTitle:'영화 장르 맞히기',labHint:'그래프를 눌러 새 영화를 놓아 보세요. 가장 가까운 k편의 장르가 다수결로 결과를 정합니다.',
+goals:['분류가 범주를 예측하는 지도학습임을 설명할 수 있다.','k-최근접 이웃의 예측 과정을 설명할 수 있다.','k 값에 따라 결정 경계가 달라지는 것을 비교할 수 있다.'],
+concept:`<p>합격/불합격, 스팸/정상처럼 <strong>범주</strong>를 예측하는 지도학습을 <strong>분류</strong>라고 합니다.</p>
+<p><strong>k-최근접 이웃(k-NN)</strong>은 새 데이터와 가장 가까운 k개의 학습 데이터를 찾아 그중 많은 쪽 범주로 정합니다. 미리 식을 만들지 않고, 예측할 때마다 거리를 계산합니다.</p>
+<ul><li><strong>k가 작으면</strong> 주변 한두 점에 휘둘려 경계가 들쭉날쭉해집니다(과적합).</li><li><strong>k가 크면</strong> 경계가 매끈해지지만 작은 패턴을 놓칩니다.</li><li>두 범주일 때 k를 홀수로 정하면 동점을 피할 수 있습니다.</li><li>특성의 단위가 다르면(예: 키 cm와 몸무게 kg) 거리 계산이 한쪽에 치우치므로 범위를 맞춰 줍니다.</li></ul>`,
+keys:['분류','k-NN','거리','결정 경계','과적합'],
+prompt:`k-최근접 이웃 분류를 체험하는 스트림릿 앱을 main.py 하나로 만들어 줘.
+예시 데이터로 영화 30편을 만들어 줘. 특성은 '액션 장면 수'와 '웃음 장면 수'(0~10), 레이블은 '액션' 또는 '코미디'야.
+사이드바에서 새 영화의 두 특성과 k(1~15, 홀수)를 고르면,
+산점도에 새 영화와 가장 가까운 k편을 선으로 이어 보여 주고, 다수결 결과를 크게 표시해 줘.
+k를 바꿀 때 결정 경계가 어떻게 달라지는지 배경색으로 보여 줘.
+scikit-learn과 plotly를 쓰고, requirements.txt도 같이 줘.`,
+think:['k=1일 때와 k=15일 때 경계 모양을 비교하고, 어느 쪽이 새 데이터에 더 잘 맞을지 예상해 봅시다.','친구 추천 앱이 "가장 비슷한 친구"를 찾을 때 어떤 특성을 쓰면 안 될까요?']},
+{n:9,u:'u3',title:'분류 모델 평가',tag:'혼동행렬로 틀린 방식까지 따지기',lab:'conf',labTitle:'스팸 필터 임계값 정하기',labHint:'메일 40통(예시)의 스팸 점수입니다. 임계값 이상이면 스팸으로 분류합니다. 임계값을 옮기며 혼동행렬과 지표를 확인하세요.',
+goals:['혼동행렬의 네 칸(TP·FP·FN·TN)을 읽을 수 있다.','정확도·정밀도·재현율을 계산할 수 있다.','상황에 따라 더 중요한 지표를 골라 근거를 댈 수 있다.'],
+concept:`<p>분류 모델은 '얼마나 맞혔나'만으로는 부족하고, <strong>어떻게 틀렸나</strong>를 함께 봐야 합니다. 그 표가 <strong>혼동행렬</strong>입니다.</p>
+<div class="tbl"><table><thead><tr><th></th><th>스팸이라고 예측</th><th>정상이라고 예측</th></tr></thead><tbody>
+<tr><th>실제 스팸</th><td>TP 참양성</td><td>FN 거짓음성 (스팸을 놓침)</td></tr>
+<tr><th>실제 정상</th><td>FP 거짓양성 (정상 메일을 버림)</td><td>TN 참음성</td></tr></tbody></table></div>
+<div class="formula">정확도 = (TP + TN) / 전체
+정밀도 = TP / (TP + FP)   → 스팸이라 한 것 중 진짜 스팸
+재현율 = TP / (TP + FN)   → 진짜 스팸 중 잡아낸 비율
+F1     = 2 × 정밀도 × 재현율 / (정밀도 + 재현율)</div>
+<p>대학 합격 통지 메일을 스팸함에 버리면 큰일이므로 스팸 필터는 <strong>정밀도</strong>가 중요합니다. 질병 검사는 환자를 놓치면 안 되므로 <strong>재현율</strong>이 중요합니다. 임계값을 바꾸면 두 지표는 한쪽이 오르면 다른 쪽이 내려갑니다.</p>`,
+keys:['혼동행렬','정확도','정밀도','재현율','F1','임계값'],
+prompt:`스팸 필터 평가 스트림릿 앱을 main.py 하나로 만들어 줘.
+예시 데이터로 메일 100통을 만들고, 각 메일에 실제 레이블(스팸/정상)과 모델의 스팸 점수(0~1)를 넣어 줘.
+임계값 슬라이더(0~1)를 움직이면 혼동행렬을 2×2 히트맵으로 보여 주고,
+정확도, 정밀도, 재현율, F1을 큰 숫자로 보여 줘.
+임계값에 따른 정밀도와 재현율의 변화를 꺾은선 그래프로 함께 그려 줘.
+scikit-learn과 plotly를 쓰고, requirements.txt도 같이 줘.`,
+think:['스팸이 100통 중 1통뿐인 메일함에서 "전부 정상"이라고 답하는 모델의 정확도는 몇 %일까요? 이 모델은 좋은 모델일까요?','코로나 신속항원검사는 정밀도와 재현율 중 무엇을 더 중요하게 봐야 할까요?']},
+{n:10,u:'u3',title:'군집 — k-평균',tag:'정답 없이 비슷한 것끼리 묶기',lab:'kmeans',labTitle:'k-평균 한 단계씩 실행하기',labHint:'‘한 단계’를 눌러 할당과 중심 이동을 번갈아 실행해 보세요. 중심이 더 이상 움직이지 않으면 끝납니다.',
+goals:['군집이 레이블 없이 구조를 찾는 비지도학습임을 설명할 수 있다.','k-평균의 할당과 중심 이동 과정을 설명할 수 있다.','k와 초기 중심에 따라 결과가 달라짐을 확인할 수 있다.'],
+concept:`<p>정답(레이블) 없이 비슷한 데이터끼리 묶는 것을 <strong>군집</strong>이라고 합니다. 고객을 구매 습관별로 나누거나, 학생 설문 응답을 성향별로 나눌 때 씁니다.</p>
+<div class="flow"><span><em>1</em>중심 k개를 임의로 놓기</span><i>›</i><span><em>2</em>각 점을 가장 가까운 중심에 할당</span><i>›</i><span><em>3</em>중심을 소속 점들의 평균으로 이동</span><i>›</i><span><em>4</em>변화가 없을 때까지 2–3 반복</span></div>
+<p>k는 사람이 정합니다. 점과 중심 사이 거리 제곱의 합(군집 내 제곱합)이 작을수록 잘 뭉친 것이지만, k를 늘리면 이 값은 항상 줄어들기 때문에 줄어드는 폭이 꺾이는 지점(엘보)을 참고합니다. 처음 중심을 어디에 두느냐에 따라 결과가 달라질 수 있습니다.</p>`,
+keys:['비지도학습','군집','중심','군집 내 제곱합','엘보 방법'],
+prompt:`k-평균 군집을 체험하는 스트림릿 앱을 main.py 하나로 만들어 줘.
+예시 데이터로 학생 60명의 '하루 독서 시간'과 '하루 운동 시간'을 만들어 줘.
+사이드바에서 k(2~6)를 고르면 k-평균으로 묶은 산점도를 군집별 색으로 보여 주고, 중심은 큰 X로 표시해 줘.
+k를 1부터 8까지 바꿔 가며 군집 내 제곱합(inertia)을 꺾은선으로 그려 엘보 지점을 찾게 해 줘.
+군집마다 평균값 표를 보여 주고, 각 군집에 어울리는 이름을 붙일 수 있게 텍스트 입력칸을 만들어 줘.
+scikit-learn과 plotly를 쓰고, requirements.txt도 같이 줘.`,
+think:['같은 데이터로 ‘새 데이터’를 여러 번 눌렀을 때 결과가 달라진 적이 있나요? 왜 그럴까요?','군집 결과에 붙인 이름("공부파", "운동파")이 편견을 만들 수 있는 경우는 언제일까요?']},
+{n:11,u:'u3',title:'인공 신경망의 첫걸음',tag:'퍼셉트론 하나로 논리 연산 배우기',lab:'perc',labTitle:'퍼셉트론 조종하기',labHint:'가중치와 편향을 바꿔 목표 연산의 진리표를 모두 맞혀 보세요. ‘자동 학습’을 누르면 퍼셉트론 규칙으로 스스로 찾아갑니다.',
+goals:['퍼셉트론이 입력에 가중치를 곱해 더하고 판단하는 과정을 설명할 수 있다.','가중치와 편향이 결정 경계를 어떻게 바꾸는지 설명할 수 있다.','XOR 문제로 다층 신경망이 필요한 이유를 설명할 수 있다.'],
+concept:`<p>뇌의 신경세포를 흉내 낸 가장 단순한 모델이 <strong>퍼셉트론</strong>입니다. 입력마다 중요도(<strong>가중치</strong>)를 곱해 더하고 <strong>편향</strong>을 더한 뒤, 그 값이 0 이상이면 1, 아니면 0을 내보냅니다. 이렇게 출력을 정하는 함수를 <strong>활성화 함수</strong>라고 합니다.</p>
+<div class="formula">합 = w₁·x₁ + w₂·x₂ + b
+출력 = 1 (합 ≥ 0) , 0 (합 &lt; 0)</div>
+<p>퍼셉트론 하나가 긋는 경계는 직선 하나입니다. AND와 OR은 직선 하나로 나눌 수 있지만, XOR(둘 중 하나만 1일 때 1)은 직선 하나로 나눌 수 없습니다. 그래서 퍼셉트론을 여러 층으로 쌓은 <strong>다층 신경망</strong>이 등장했고, 층을 깊게 쌓은 것이 오늘날의 <strong>딥러닝</strong>입니다.</p>`,
+keys:['퍼셉트론','가중치','편향','활성화 함수','XOR','딥러닝'],
+prompt:`퍼셉트론을 체험하는 스트림릿 앱을 main.py 하나로 만들어 줘.
+목표 연산(AND, OR, NAND, XOR)을 고르고, 슬라이더로 w1, w2, b를 바꾸면
+진리표에 x1, x2, 가중합, 출력, 정답, 맞음/틀림을 보여 줘.
+네 점과 결정 경계 직선을 plotly 그래프로 그려 줘.
+'학습' 버튼을 누르면 퍼셉트론 학습 규칙(학습률 0.1)으로 한 에포크씩 가중치를 고치고, 에포크별 틀린 개수를 꺾은선으로 보여 줘.
+XOR에서는 50 에포크가 지나도 다 맞히지 못한다는 것을 확인할 수 있게 해 줘.
+requirements.txt도 같이 줘.`,
+think:['AND를 만드는 가중치와 편향을 두 가지 이상 찾아봅시다. 왜 답이 하나가 아닐까요?','XOR을 풀려면 퍼셉트론 몇 개를 어떻게 연결하면 될지 그림으로 그려 봅시다.']},
+{n:12,u:'u3',title:'AI 윤리와 데이터 편향',tag:'전체 정확도 뒤에 숨은 차이 찾기',lab:'bias',labTitle:'편향된 학습 데이터 시뮬레이션',labHint:'얼굴 표정 인식 AI(가상)의 학습 데이터 구성을 바꿔 보세요. 집단별 정확도와 전체 정확도가 어떻게 달라지는지 확인합니다.',
+goals:['학습 데이터의 편향이 모델의 차별로 이어지는 과정을 설명할 수 있다.','전체 정확도와 집단별 정확도를 나눠 확인할 수 있다.','내 실습에서 개인정보·공정성·책임 문제를 찾아 개선안을 제시할 수 있다.'],
+concept:`<p>AI는 데이터에 담긴 세상을 그대로 배웁니다. 학습 데이터에 한 집단이 적게 들어 있으면, 모델은 그 집단에서 더 자주 틀립니다. 그런데 평가 데이터도 같은 비율이라면 <strong>전체 정확도</strong>는 높게 나와 문제가 잘 보이지 않습니다.</p>
+<ul><li><strong>공정성</strong> — 집단별로 성능을 나누어 확인하고, 차이가 크면 데이터를 보강합니다.</li>
+<li><strong>개인정보</strong> — 이름·학번·얼굴처럼 사람을 알아볼 수 있는 정보는 꼭 필요한 만큼만 모으고 동의를 받습니다.</li>
+<li><strong>투명성과 책임</strong> — 어떤 데이터로 어떻게 판단했는지 설명할 수 있어야 하고, 최종 결정에는 사람이 책임을 집니다.</li>
+<li><strong>생성형 AI 활용</strong> — AI가 만든 코드와 글은 그대로 믿지 말고 실행·출처로 확인하며, 사용 사실을 밝힙니다.</li></ul>`,
+keys:['데이터 편향','공정성','개인정보','투명성','책임'],
+prompt:`이번 학기 내가 만든 앱(급식, 기온, 영화, 스팸 필터 중 하나)의 코드를 붙여 넣을게.
+이 앱에서 생길 수 있는 윤리 문제를 개인정보, 공정성(편향), 투명성, 책임 네 가지 관점으로 찾아 줘.
+관점마다 '문제 상황 → 누가 피해를 보는가 → 코드나 화면에서 고칠 수 있는 개선안' 순서로 표로 정리해 줘.
+개선안 중 하나를 골라 실제 코드로 반영한 수정본도 보여 줘.`,
+think:['우리 학교에서 AI로 무언가를 자동으로 결정한다면(예: 동아리 배정), 어떤 데이터는 쓰면 안 될까요?','"AI가 그렇게 판단했다"는 말로 책임을 피할 수 있을까요? 누가 책임져야 하는지 토론해 봅시다.']},
+];
+const unitOf=l=>UNITS.find(u=>u.id===l.u);
+const id2=n=>'l'+String(n).padStart(2,'0');
+
+const GLOSS=[
+['데이터','관찰·측정·조사로 얻은 값. 숫자, 글, 사진, 소리 모두 데이터가 될 수 있다.',1],
+['데이터 분석 6단계','문제 정의 → 수집 → 전처리 → 분석 → 시각화 → 해석과 공유.',1],
+['정형 데이터','행과 열이 정해진 표 형태의 데이터. 예: 스프레드시트, CSV.',2],
+['반정형 데이터','키-값 이름표로 구조를 표현하지만 모양이 자유로운 데이터. 예: JSON, XML.',2],
+['비정형 데이터','정해진 틀이 없는 데이터. 예: 사진, 글, 음성, 영상.',2],
+['API','프로그램끼리 데이터를 주고받기 위한 약속. 주소와 매개변수로 요청하고 응답을 받는다.',2],
+['JSON','{ "키": 값 } 모양으로 데이터를 적는 형식. 웹 API 응답에 널리 쓰인다.',2],
+['CSV','값을 쉼표로 구분해 적은 표 형식의 텍스트 파일.',2],
+['결측치','비어 있거나 기록되지 않은 값.',3],
+['이상치','다른 값들과 동떨어진 값. 입력 실수일 수도, 실제 특이값일 수도 있다.',3],
+['전처리','분석 전에 데이터를 정리하는 일. 결측치·이상치 처리, 형식 통일 등.',3],
+['중앙값','값을 크기 순으로 늘어놓았을 때 한가운데 값. 이상치에 덜 흔들린다.',3],
+['시각화','데이터를 그래프나 그림으로 나타내 패턴을 한눈에 보이게 하는 일.',4],
+['산점도','두 변수의 값을 점으로 찍어 관계를 보는 그래프.',4],
+['인공지능','사람의 지능이 하는 일(인식, 판단, 예측 등)을 컴퓨터가 하도록 만든 기술.',5],
+['기계학습','규칙을 직접 짜지 않고 데이터에서 규칙(모델)을 찾아내는 방법.',5],
+['지도학습','정답(레이블)이 있는 데이터로 학습하는 방법. 회귀와 분류가 있다.',5],
+['비지도학습','정답 없이 데이터의 구조를 찾는 학습 방법. 대표적으로 군집.',5],
+['강화학습','행동의 결과로 받은 보상을 바탕으로 더 나은 행동을 익히는 학습 방법.',5],
+['특성','모델에 입력하는 값. 교과서에 따라 속성, 독립 변수라고도 한다.',5],
+['레이블','모델이 맞혀야 하는 정답 값. 종속 변수, 목표 변수라고도 한다.',5],
+['모델','학습으로 찾아낸 규칙. 입력을 받아 예측을 내놓는다.',5],
+['회귀','수치를 예측하는 지도학습. 예: 기온, 점수, 집값.',6],
+['선형 회귀','데이터를 가장 잘 대표하는 직선(평면)을 찾아 예측하는 방법.',6],
+['가중치(기울기)','입력이 1 늘 때 예측값이 얼마나 변하는지 나타내는 수.',6],
+['편향(절편)','입력이 0일 때의 예측값. 직선을 위아래로 옮긴다.',6],
+['상관계수','두 변수가 함께 변하는 방향과 강도를 −1~+1로 나타낸 값.',6],
+['외삽','학습에 쓴 데이터 범위 밖의 값을 예측하는 일. 오차가 커질 위험이 있다.',6],
+['MAE','평균 절대 오차. 오차 절댓값의 평균.',7],
+['MSE · RMSE','오차 제곱의 평균과 그 제곱근. 큰 오차에 더 큰 벌점을 준다.',7],
+['결정계수 R²','평균으로 예측할 때보다 오차를 얼마나 줄였는지 나타내는 값. 1에 가까울수록 좋다.',7],
+['분류','범주를 예측하는 지도학습. 예: 스팸/정상, 합격/불합격.',8],
+['k-최근접 이웃','가장 가까운 k개 학습 데이터의 다수결로 범주를 정하는 분류 방법.',8],
+['과적합','학습 데이터에 지나치게 맞춰져 새 데이터에서는 성능이 떨어지는 상태.',8],
+['혼동행렬','실제 범주와 예측 범주를 교차해 맞고 틀린 개수를 정리한 표.',9],
+['정확도','전체 중 맞힌 비율.',9],
+['정밀도','양성이라고 예측한 것 중 실제 양성의 비율.',9],
+['재현율','실제 양성 중 모델이 양성으로 잡아낸 비율.',9],
+['군집','레이블 없이 비슷한 데이터끼리 묶는 비지도학습.',10],
+['k-평균','중심 k개를 두고 할당과 중심 이동을 반복해 군집을 찾는 방법.',10],
+['퍼셉트론','입력에 가중치를 곱해 더하고 기준을 넘으면 1을 내는 가장 단순한 인공 뉴런.',11],
+['활성화 함수','뉴런의 가중합을 받아 출력을 정하는 함수. 예: 계단 함수, 시그모이드, ReLU.',11],
+['딥러닝','여러 층의 인공 신경망을 깊게 쌓아 학습하는 방법.',11],
+['데이터 편향','학습 데이터가 현실의 일부를 덜 또는 더 담아 모델 판단이 한쪽으로 치우치는 현상.',12],
+['바이브 코딩','만들고 싶은 기능을 자연어 프롬프트로 설명해 AI와 함께 코드를 만드는 방식.',1],
+['프롬프트','생성형 AI에게 주는 지시문. 목적, 데이터, 출력 형식을 구체적으로 적을수록 좋다.',1],
+];
+
+/* ---------- 라우터 ---------- */
+const app=$('#app');
+let heroStop=null;
+const HOME_SECTIONS=['home','units','labs','resources'];
+function done(){return new Set(store.get('gbgh-done',[]));}
+function route(){
+  const t=(location.hash||'#home').slice(1);
+  redrawers.clear();if(heroStop){heroStop();heroStop=null;}
+  app.innerHTML='';
+  document.querySelectorAll('[data-nav]').forEach(a=>a.classList.toggle('on',a.dataset.nav===t||(t.startsWith('l')&&/^l\d\d$/.test(t)&&a.dataset.nav==='units')));
+  const m=/^l(\d\d)$/.exec(t);
+  if(m&&L[+m[1]-1]){renderLesson(L[+m[1]-1]);window.scrollTo(0,0);}
+  else if(t==='glossary'){renderGlossary();window.scrollTo(0,0);}
+  else if(t==='project'){renderProject();window.scrollTo(0,0);}
+  else{renderHome();const s=document.getElementById(t);if(s&&t!=='home')requestAnimationFrame(()=>s.scrollIntoView());else window.scrollTo(0,0);}
+}
+window.addEventListener('hashchange',route);
+const mq=matchMedia('(prefers-color-scheme: dark)');
+const redrawAll=()=>redrawers.forEach(f=>f());
+mq.addEventListener?.('change',redrawAll);
+new MutationObserver(redrawAll).observe(document.documentElement,{attributes:true,attributeFilter:['data-theme']});
+
+/* ---------- 홈 ---------- */
+function renderHome(){
+  const d=done();
+  const hero=h('section',{class:'hero wrap',id:'home'},
+    h('span',{class:'eyebrow'},'경북여자고등학교 · 정보 · 데이터와 인공지능'),
+    h('h1',null,'데이터로 묻고,',h('br'),h('span',{class:'grad'},'인공지능으로 답하다.')),
+    h('p',{class:'lead'},'급식 API부터 대구의 기온, 스팸 필터와 신경망까지. 12차시 동안 데이터를 모으고, 모델을 만들고, 그 결과를 책임 있게 설명해 봅니다.'),
+    h('div',{class:'cta'},h('a',{class:'btn',href:'#l01'},'1차시부터 시작하기 ›'),h('a',{class:'btn ghost',href:'#labs'},'실험실 둘러보기')));
+  const stage=h('div',{class:'stage'});
+  hero.append(stage);
+  app.append(hero);
+  heroStop=buildHero(stage);
+
+  const doneN=d.size, pct=doneN/L.length, R=20, circ=2*Math.PI*R;
+  const ring=h('div',{class:'progress',html:`<svg width="48" height="48" viewBox="0 0 48 48" aria-hidden="true"><circle cx="24" cy="24" r="${R}" fill="none" stroke="var(--surface2)" stroke-width="6"/><circle cx="24" cy="24" r="${R}" fill="none" stroke="var(--accent)" stroke-width="6" stroke-linecap="round" stroke-dasharray="${circ}" stroke-dashoffset="${circ*(1-pct)}" transform="rotate(-90 24 24)"/></svg><div><b>${doneN} / ${L.length}</b><span>완료한 차시<br>이 기기에 저장됩니다</span></div>`});
+  const sec=h('section',{class:'sec wrap',id:'units'},
+    h('div',{class:'sec-h'},h('div',null,h('span',{class:'eyebrow'},'차시별 교재'),h('h2',null,'세 단원, 열두 차시.')),ring));
+  UNITS.forEach(u=>{
+    const wrap=h('div',{class:'unit',style:`--uc:var(--${u.id})`},
+      h('div',{class:'unit-h'},h('span',{class:'no'},`${u.no} · ${u.range[0]}–${u.range[1]}차시`),h('h3',null,u.name),h('span',null,u.sub)));
+    const cards=h('div',{class:'cards'});
+    L.filter(l=>l.u===u.id).forEach(l=>{
+      cards.append(h('a',{class:'lcard',href:'#'+id2(l.n)},
+        d.has(l.n)?h('span',{class:'done','aria-label':'완료'},'✓'):null,
+        h('span',{class:'n'},String(l.n).padStart(2,'0')),
+        h('h4',null,l.title),h('p',null,l.tag),h('span',{class:'lab'},'실험 · '+l.labTitle)));
+    });
+    wrap.append(cards);sec.append(wrap);
+  });
+  app.append(sec);
+
+  const pick=[[6,'w3'],[8,'w3'],[9,''],[10,''],[11,'']];
+  const labs=h('section',{class:'sec wrap',id:'labs'},
+    h('div',{class:'sec-h'},h('div',null,h('span',{class:'eyebrow'},'실험실'),h('h2',null,'만지면서 이해하는 모델.')),h('p',null,'모든 차시에 직접 움직여 보는 실험이 하나씩 있습니다. 슬라이더를 밀고, 점을 찍고, 결과가 바뀌는 순간을 확인하세요.')));
+  const bento=h('div',{class:'bento'});
+  pick.forEach(([n,w],i)=>{const l=L[n-1];bento.append(h('a',{class:'tile '+w+(i===0?' dark':''),href:'#'+id2(n),style:`--uc:var(--${l.u})`},h('span',{class:'eyebrow',style:'color:var(--uc)'},`${n}차시 · ${l.title}`),h('h4',null,l.labTitle),h('p',null,l.labHint),h('span',{class:'go'},'실험하러 가기 ›')));});
+  labs.append(bento);app.append(labs);
+
+  const res=h('section',{class:'sec wrap',id:'resources'},
+    h('div',{class:'sec-h'},h('div',null,h('span',{class:'eyebrow'},'학습 자료'),h('h2',null,'찾아보고, 더 탐구하기.'))));
+  const b2=h('div',{class:'bento'});
+  b2.append(
+    h('a',{class:'tile w3',href:'#glossary'},h('h4',null,'용어사전'),h('p',null,`수업에 나오는 용어 ${GLOSS.length}개를 검색하고, 처음 나온 차시로 바로 이동합니다.`),h('span',{class:'go'},'용어 찾기 ›')),
+    h('a',{class:'tile w3',href:'#project'},h('h4',null,'팀 프로젝트'),h('p',null,'우리 학교·우리 지역 데이터로 질문을 세우고 모델을 만들어 발표합니다. 단계별 안내와 점검표.'),h('span',{class:'go'},'프로젝트 안내 ›')),
+    h('div',{class:'tile w3 dark'},h('h4',null,'공공데이터 바로가기'),h('p',null,'실습과 프로젝트에 쓸 수 있는 공식 데이터 창구입니다.'),
+      h('div',{class:'links'},...[['나이스 교육정보 개방 포털','https://open.neis.go.kr'],['공공데이터포털','https://www.data.go.kr'],['기상자료개방포털','https://data.kma.go.kr'],['KOSIS 국가통계포털','https://kosis.kr'],['학교알리미','https://www.schoolinfo.go.kr']].map(([t,u])=>h('a',{href:u,target:'_blank',rel:'noopener'},t+' ↗')))),
+    h('div',{class:'tile w3'},h('h4',null,'실습 도구'),h('p',null,'바이브 코딩 프롬프트로 만든 앱을 실행하고 공유하는 도구입니다.'),
+      h('div',{class:'links'},...[['Streamlit 문서','https://docs.streamlit.io'],['Google Colab','https://colab.research.google.com'],['Teachable Machine','https://teachablemachine.withgoogle.com'],['scikit-learn','https://scikit-learn.org']].map(([t,u])=>h('a',{href:u,target:'_blank',rel:'noopener'},t+' ↗'))))
+  );
+  res.append(b2);app.append(res);
+}
+
+/* 히어로: 같은 점들을 회귀 · 군집 · 분류로 다르게 읽기 */
+function buildHero(stage){
+  let mode='reg';const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const read=h('span',{class:'read'});
+  const caps={reg:'회귀 — 점들을 가장 잘 대표하는 직선을 찾습니다. 그래프를 누르면 점이 추가되고 직선이 다시 학습됩니다.',clu:'군집 — 레이블 없이 가까운 점끼리 세 무리로 묶습니다. 중심(◆)이 매 순간 소속 점들의 평균으로 이동합니다.',cls:'분류 — 가까운 이웃 5개의 다수결로 영역을 칠합니다. 커서를 움직여 그 위치의 예측을 확인하세요. 누를 때마다 두 범주의 점이 번갈아 추가됩니다.'};
+  const cap=h('div',{class:'stage-cap'},caps.reg);
+  stage.append(h('div',{class:'stage-bar'},seg([['reg','회귀'],['clu','군집'],['cls','분류']],'reg',v=>{mode=v;cap.textContent=caps[v];}),read));
+  const c=h('canvas',{'aria-label':'점을 회귀, 군집, 분류로 보여 주는 인터랙티브 그래프',role:'img'});stage.append(c,cap);
+  const ctx=c.getContext('2d');
+  const r=rng(2026);const pts=[];
+  [[.2,.28,0],[.5,.52,-1],[.8,.76,1]].forEach(([cx,cy,lab],bi)=>{for(let i=0;i<16;i++){const x=cx+gauss(r)*.07,y=cy+gauss(r)*.08;pts.push({x,y,c:lab<0?(x+gauss(r)*.03<.5?0:1):lab,ph:r()*6.28});}});
+  let cents=[[.3,.6],[.6,.3],[.7,.8]].map(([x,y])=>({x,y,dx:x,dy:y}));
+  let mouse=null,addLab=0,W=0,H=0,raf=0,t=0;
+  function size(){const w=stage.clientWidth;const hh=Math.round(Math.min(Math.max(w*.5,260),400));const d=devicePixelRatio||1;c.width=w*d;c.height=hh*d;c.style.height=hh+'px';ctx.setTransform(d,0,0,d,0,0);W=w;H=hh;}
+  const ro=new ResizeObserver(()=>{size();if(reduce)draw();});ro.observe(stage);size();
+  const P=p=>({x:24+p.x*(W-48),y:H-20-p.y*(H-40)});
+  c.addEventListener('pointermove',e=>{const b=c.getBoundingClientRect();mouse={x:(e.clientX-b.left-24)/(W-48),y:(H-20-(e.clientY-b.top))/(H-40)};if(reduce)draw();});
+  c.addEventListener('pointerleave',()=>{mouse=null;if(reduce)draw();});
+  c.addEventListener('click',e=>{const b=c.getBoundingClientRect();const x=(e.clientX-b.left-24)/(W-48),y=(H-20-(e.clientY-b.top))/(H-40);pts.push({x,y,c:addLab,ph:r()*6.28});addLab^=1;if(reduce)draw();});
+  function knn(x,y,k){const ds=cur.map(p=>[(p.x-x)**2+(p.y-y)**2,p.c]).sort((a,b)=>a[0]-b[0]).slice(0,k);return ds.filter(d=>d[1]===1).length>k/2?1:0;}
+  let cur=[];
+  function draw(){
+    t+=0.016;
+    cur=pts.map(p=>({x:p.x+(reduce?0:Math.sin(t*.7+p.ph)*.006),y:p.y+(reduce?0:Math.cos(t*.6+p.ph)*.006),c:p.c}));
+    ctx.clearRect(0,0,W,H);
+    const cA=C('c1'),cB=C('c2'),cC=C('c3'),fg=C('fg'),mu=C('muted');
+    ctx.strokeStyle=C('grid');ctx.lineWidth=1;
+    for(let i=0;i<=10;i++){const y=20+i*(H-40)/10;ctx.beginPath();ctx.moveTo(24,y);ctx.lineTo(W-24,y);ctx.stroke();}
+    if(mode==='reg'){
+      const f=lsq(cur.map(p=>[p.x,p.y]));
+      ctx.strokeStyle=alpha(C('bad'),.45);ctx.lineWidth=1.2;
+      cur.forEach(p=>{const a=P(p),b=P({x:p.x,y:f.a*p.x+f.b});ctx.beginPath();ctx.moveTo(a.x,a.y);ctx.lineTo(b.x,b.y);ctx.stroke();});
+      cur.forEach(p=>{const a=P(p);dot(ctx,a.x,a.y,4.5,fg);});
+      const p0=P({x:-.02,y:f.a*-.02+f.b}),p1=P({x:1.02,y:f.a*1.02+f.b});
+      ctx.strokeStyle=C('accent');ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(p0.x,p0.y);ctx.lineTo(p1.x,p1.y);ctx.stroke();
+      read.textContent=`점 ${cur.length}개 · 상관계수 r = ${fx(f.r,2)} · ŷ = ${fx(f.a,2)}x ${f.b>=0?'+':'−'} ${fx(Math.abs(f.b),2)}`;
+    }else if(mode==='clu'){
+      const as=cur.map(p=>{let bi=0,bd=1e9;cents.forEach((q,i)=>{const d=(p.x-q.x)**2+(p.y-q.y)**2;if(d<bd){bd=d;bi=i;}});return bi;});
+      cents.forEach((q,i)=>{const m=cur.filter((_,j)=>as[j]===i);if(m.length){q.x=m.reduce((s,p)=>s+p.x,0)/m.length;q.y=m.reduce((s,p)=>s+p.y,0)/m.length;}q.dx+=(q.x-q.dx)*.08;q.dy+=(q.y-q.dy)*.08;});
+      const cols=[cA,cB,cC];
+      cur.forEach((p,j)=>{const a=P(p),q=P({x:cents[as[j]].dx,y:cents[as[j]].dy});ctx.strokeStyle=alpha(cols[as[j]],.22);ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(a.x,a.y);ctx.lineTo(q.x,q.y);ctx.stroke();});
+      cur.forEach((p,j)=>{const a=P(p);dot(ctx,a.x,a.y,4.5,cols[as[j]]);});
+      cents.forEach((q,i)=>{const a=P({x:q.dx,y:q.dy});ctx.save();ctx.translate(a.x,a.y);ctx.rotate(Math.PI/4);ctx.fillStyle=cols[i];ctx.strokeStyle=C('surface');ctx.lineWidth=3;ctx.fillRect(-8,-8,16,16);ctx.strokeRect(-8,-8,16,16);ctx.restore();});
+      const sse=cur.reduce((s,p,j)=>s+(p.x-cents[as[j]].x)**2+(p.y-cents[as[j]].y)**2,0);
+      read.textContent=`k = 3 · 군집 크기 ${[0,1,2].map(i=>as.filter(a=>a===i).length).join(' / ')} · 군집 내 제곱합 ${fx(sse,3)}`;
+    }else{
+      const cs=16;
+      for(let gx=24;gx<W-24;gx+=cs)for(let gy=20;gy<H-20;gy+=cs){const x=(gx+cs/2-24)/(W-48),y=(H-20-(gy+cs/2))/(H-40);ctx.fillStyle=alpha(knn(x,y,5)?cB:cA,.13);ctx.fillRect(gx,gy,cs,cs);}
+      cur.forEach(p=>{const a=P(p);dot(ctx,a.x,a.y,4.5,p.c?cB:cA,C('surface'),1.5);});
+      if(mouse){const pr=knn(mouse.x,mouse.y,5);const ns=cur.map(p=>[(p.x-mouse.x)**2+(p.y-mouse.y)**2,p]).sort((a,b)=>a[0]-b[0]).slice(0,5);const m=P(mouse);
+        ctx.strokeStyle=mu;ctx.lineWidth=1;ns.forEach(([,p])=>{const a=P(p);ctx.beginPath();ctx.moveTo(m.x,m.y);ctx.lineTo(a.x,a.y);ctx.stroke();});
+        dot(ctx,m.x,m.y,8,pr?cB:cA,fg,2.5);read.textContent=`k = 5 · 커서 위치 예측: ${pr?'주황':'파랑'} (이웃 ${ns.filter(n=>n[1].c===pr).length}/5)`;}
+      else read.textContent=`k = 5 · 점 ${cur.length}개 · 그래프 위로 커서를 움직여 보세요`;
+    }
+  }
+  function loop(){draw();raf=requestAnimationFrame(loop);}
+  if(reduce)draw();else loop();
+  return()=>{cancelAnimationFrame(raf);ro.disconnect();};
+}
+
+/* ---------- 차시 페이지 ---------- */
+function renderLesson(l){
+  const u=unitOf(l);const root=h('div',{style:`--uc:var(--${u.id})`});
+  root.append(h('section',{class:'lhero wrap'},
+    h('div',{class:'crumb'},h('a',{href:'#units'},'차시별 교재'),h('span',null,'›'),h('b',null,`${u.no}. ${u.name}`),h('span',null,'·'),h('span',null,`${l.n}차시`)),
+    h('h1',null,l.title),h('p',{class:'tag'},l.tag),
+    h('div',{class:'goals'},...l.goals.map((g,i)=>h('div',{class:'goal'},h('b',null,`목표 ${i+1}`),g)))));
+  root.append(h('section',{class:'block wrap'},h('h2',null,'개념 이해'),h('div',{class:'prose',html:l.concept}),h('div',{class:'keys',style:'margin-top:18px'},...l.keys.map(k=>h('span',null,'#'+k)))));
+  const lb=h('div',{class:'lab-b'});
+  root.append(h('section',{class:'block wrap'},h('h2',null,'실험실'),h('div',{class:'labcard'},h('div',{class:'lab-h'},h('div',null,h('h3',null,l.labTitle),h('p',null,l.labHint)),h('span',{class:'chip'},'예시 데이터')),lb)));
+  const pre=h('pre',{id:'prompt-'+l.n},l.prompt);
+  const copyBtn=h('button',{type:'button',class:'btn sm soft'},'복사');
+  copyBtn.addEventListener('click',()=>{const done=()=>{copyBtn.textContent='복사됨';setTimeout(()=>copyBtn.textContent='복사',1600);};try{navigator.clipboard.writeText(l.prompt).then(done,()=>sel());}catch(e){sel();}function sel(){const r=document.createRange();r.selectNodeContents(pre);const s=getSelection();s.removeAllRanges();s.addRange(r);copyBtn.textContent='선택됨 · Ctrl+C';}});
+  root.append(h('section',{class:'block wrap'},h('h2',null,'바이브 코딩 실습'),
+    h('div',{class:'prose',style:'margin-bottom:18px'},h('p',null,'아래 프롬프트를 생성형 AI에 붙여 넣어 앱을 만들고, 실행 결과가 실험실에서 본 것과 같은지 확인합니다. 받은 코드는 한 줄씩 읽어 보고, 이해되지 않는 부분은 다시 질문하세요.')),
+    h('div',{class:'prompt'},h('div',{class:'prompt-h'},h('span',null,'프롬프트'),copyBtn),pre)));
+  root.append(h('section',{class:'block wrap'},h('h2',null,'생각해 보기'),h('ol',{class:'think'},...l.think.map(t=>h('li',null,t)))));
+  const d=done();const isDone=d.has(l.n);
+  const mark=h('button',{type:'button',class:'btn'+(isDone?' soft':'')},isDone?'✓ 완료한 차시':'이 차시 완료로 표시');
+  mark.addEventListener('click',()=>{const s=done();s.has(l.n)?s.delete(l.n):s.add(l.n);store.set('gbgh-done',[...s]);const on=s.has(l.n);mark.textContent=on?'✓ 완료한 차시':'이 차시 완료로 표시';mark.classList.toggle('soft',on);});
+  const prev=L[l.n-2],next=L[l.n];
+  root.append(h('div',{class:'wrap'},h('div',{class:'pager'},
+    prev?h('a',{href:'#'+id2(prev.n)},'‹ 이전 차시',h('b',null,`${prev.n}. ${prev.title}`)):h('a',{href:'#units'},'‹ 목록',h('b',null,'차시별 교재')),
+    mark,
+    next?h('a',{href:'#'+id2(next.n),style:'text-align:right'},'다음 차시 ›',h('b',null,`${next.n}. ${next.title}`)):h('a',{href:'#project',style:'text-align:right'},'다음 ›',h('b',null,'팀 프로젝트')))));
+  app.append(root);
+  LABS[l.lab](lb);
+}
+
+/* ---------- 실험실 ---------- */
+const LABS={};
+function quiz(root,items,choices){
+  let score=0,answered=0;const sc=h('div',{class:'msg'},`0 / ${items.length} 맞힘`);
+  const g=h('div',{class:'qgrid'});
+  items.forEach(it=>{
+    const fb=h('div',{class:'fb'});const card=h('div',{class:'qc'},h('p',null,it.q));
+    const row=h('div',{class:'row'});
+    choices.forEach(([v,label])=>{const b=h('button',{type:'button',class:'btn sm soft'},label);b.addEventListener('click',()=>{if(card.dataset.a)return;card.dataset.a=v;answered++;const ok=v===it.a;if(ok)score++;card.classList.add(ok?'ok':'no');fb.innerHTML='';fb.append(h('b',null,(ok?'정답 · ':'다시 생각해 보기 · ')+choices.find(c=>c[0]===it.a)[1]),it.why);sc.textContent=`${score} / ${items.length} 맞힘`+(answered===items.length?(score===items.length?' · 모두 맞혔어요!':' · 틀린 카드의 설명을 읽어 보세요.'):'');row.querySelectorAll('button').forEach(x=>x.disabled=true);});row.append(b);});
+    card.append(row,fb);g.append(card);
+  });
+  const reset=h('button',{type:'button',class:'btn sm ghost'},'다시 풀기');reset.addEventListener('click',()=>{root.innerHTML='';quiz(root,items,choices);});
+  root.append(g,h('div',{class:'row'},sc,reset));
+}
+LABS.q=root=>quiz(root,[
+  {q:'우리 학교 1학년 학생들은 평일에 평균 몇 시간 잘까?',a:'y',why:'대상(1학년), 시기(평일), 측정값(수면 시간)이 분명해 설문으로 답할 수 있습니다.'},
+  {q:'급식은 맛있을까?',a:'n',why:'"맛있다"의 기준이 없습니다. "11월 급식 만족도(5점 척도)의 메뉴별 평균은?"처럼 다듬어야 합니다.'},
+  {q:'최근 50년 동안 대구의 여름 평균기온은 올랐을까?',a:'y',why:'기상자료개방포털의 대구 관측 자료로 연도별 여름 평균을 구해 확인할 수 있습니다.'},
+  {q:'AI는 인류에게 좋은 것일까?',a:'n',why:'가치 판단이 담긴 질문이라 데이터 하나로 답할 수 없습니다. 토론 주제로는 좋지만 분석 질문으로는 쪼개야 합니다.'},
+  {q:'시험 기간이 있는 달에 도서관 대출 권수가 더 많을까?',a:'y',why:'월별 대출 기록과 학사 일정을 비교하면 답할 수 있습니다.'},
+  {q:'우리 반에서 누가 가장 친절할까?',a:'n',why:'측정 기준이 모호하고, 특정 학생을 평가해 상처를 줄 수 있어 윤리적으로도 문제가 됩니다.'},
+],[['y','데이터로 답할 수 있다'],['n','다듬어야 한다']]);
+
+LABS.ml=root=>quiz(root,[
+  {q:'"스팸" 또는 "정상" 표시가 붙은 메일 1만 통으로 스팸 필터를 학습한다.',a:'s',why:'정답(레이블)이 붙은 데이터로 범주를 맞히도록 학습하므로 지도학습(분류)입니다.'},
+  {q:'구매 기록만 가지고 쇼핑몰 고객을 비슷한 무리로 나눈다. 무리의 이름은 미리 정하지 않았다.',a:'u',why:'정답 없이 비슷한 것끼리 묶으므로 비지도학습(군집)입니다.'},
+  {q:'게임 AI가 이기면 +1, 지면 −1을 받으며 수만 판을 두어 전략을 익힌다.',a:'r',why:'행동의 결과로 받는 보상을 키우도록 배우므로 강화학습입니다.'},
+  {q:'아파트의 면적, 층, 역까지 거리와 실제 거래 가격으로 집값 예측 모델을 만든다.',a:'s',why:'정답(실제 가격)이 있고 수치를 예측하므로 지도학습(회귀)입니다.'},
+  {q:'뉴스 기사 수천 건을 내용이 비슷한 주제끼리 자동으로 묶는다.',a:'u',why:'주제 정답 없이 글의 유사성으로 묶으므로 비지도학습입니다.'},
+  {q:'로봇 청소기가 벽에 부딪힐 때마다 벌점을 받으며 더 좋은 청소 경로를 찾는다.',a:'r',why:'벌점(음의 보상)을 줄이는 방향으로 행동을 바꾸므로 강화학습입니다.'},
+],[['s','지도'],['u','비지도'],['r','강화']]);
+
+LABS.json=root=>{
+  const days=['월','화','수','목','금'];
+  const rows=[
+    {MLSV_YMD:'20261102',DDISH_NM:'차조밥<br/>쇠고기미역국 (5.6.16)<br/>닭갈비 (5.6.13.15)<br/>배추김치 (9)<br/>요구르트 (2)',CAL_INFO:'845.2 Kcal'},
+    {MLSV_YMD:'20261103',DDISH_NM:'현미밥<br/>순두부찌개 (5.9)<br/>고등어구이 (7)<br/>시금치나물 (5)<br/>깍두기 (9)',CAL_INFO:'768.9 Kcal'},
+    {MLSV_YMD:'20261104',DDISH_NM:'납작만두 (1.5.6.10)<br/>짜장밥 (5.6.10)<br/>짬뽕국 (5.6.9.17)<br/>단무지<br/>사과',CAL_INFO:'912.4 Kcal'},
+    {MLSV_YMD:'20261105',DDISH_NM:'흑미밥<br/>콩나물국<br/>돈육불고기 (5.6.10.13)<br/>계란말이 (1)<br/>배추김치 (9)',CAL_INFO:'803.7 Kcal'},
+    {MLSV_YMD:'20261106',DDISH_NM:'김치볶음밥 (5.6.9.10)<br/>유부된장국 (5.6)<br/>치킨너겟 (1.5.6.15)<br/>오이무침<br/>귤',CAL_INFO:'788.0 Kcal'},
+  ];
+  const pre=h('div',{class:'json',tabindex:'0','aria-label':'급식 API JSON 응답 예시'});
+  const t=(cls,s)=>h('span',{class:cls},s);
+  pre.append('{\n  ',t('k','"mealServiceDietInfo"'),': [\n    { ',t('k','"head"'),': [ … ] },\n    { ',t('k','"row"'),': [\n');
+  const blks=rows.map((r,i)=>{const b=h('span',{class:'blk'});b.append('      {\n');
+    [['ATPT_OFCDC_SC_CODE','D10'],['SCHUL_NM','경북여자고등학교'],['MMEAL_SC_NM','중식'],['MLSV_YMD',r.MLSV_YMD],['DDISH_NM',r.DDISH_NM],['CAL_INFO',r.CAL_INFO]].forEach(([k,v],j,a)=>{b.append('        ',t('k',`"${k}"`),': ',t('s',`"${v}"`),j<a.length-1?',\n':'\n');});
+    b.append('      }'+(i<rows.length-1?',':'')+'\n');pre.append(b);return b;});
+  pre.append('    ] }\n  ]\n}');
+  const clean=s=>s.split('<br/>').map(m=>m.replace(/\s*\([\d.]+\)/g,'').trim()).join(', ');
+  const fmtD=s=>`${s.slice(4,6)}/${s.slice(6)}`;
+  const tb=h('tbody');
+  const trs=rows.map((r,i)=>{const tr=h('tr',null,h('td',null,`${fmtD(r.MLSV_YMD)} (${days[i]})`),h('td',{class:'wrap'},clean(r.DDISH_NM)),h('td',null,parseFloat(r.CAL_INFO).toFixed(1)));
+    tr.addEventListener('mouseenter',()=>{blks[i].classList.add('hl');blks[i].scrollIntoView({block:'nearest'});});tr.addEventListener('mouseleave',()=>blks[i].classList.remove('hl'));tb.append(tr);return tr;});
+  const table=h('div',{class:'tbl'},h('table',null,h('thead',null,h('tr',null,h('th',null,'날짜 (MLSV_YMD)'),h('th',null,'메뉴 (DDISH_NM)'),h('th',null,'열량 kcal (CAL_INFO)'))),tb));
+  const jsonBox=h('div',null,pre),tableBox=h('div',null,table);
+  const view=h('div',{class:'split'},jsonBox,tableBox);
+  const msg=h('div',{class:'msg'},'질문: 이번 주 열량이 가장 높은 날은 언제일까?');
+  const ask=h('button',{type:'button',class:'btn sm'},'표에서 답 찾기');
+  ask.addEventListener('click',()=>{let mi=0;rows.forEach((r,i)=>{if(parseFloat(r.CAL_INFO)>parseFloat(rows[mi].CAL_INFO))mi=i;});trs.forEach((tr,i)=>tr.classList.toggle('top',i===mi));msg.className='msg good';msg.textContent=`답: ${fmtD(rows[mi].MLSV_YMD)}(${days[mi]}) ${rows[mi].CAL_INFO} — CAL_INFO 열에서 "Kcal"을 떼고 숫자로 바꾼 뒤 가장 큰 값을 찾았습니다.`;});
+  root.append(h('div',{class:'row'},seg([['both','나란히'],['json','JSON만'],['table','표만']],'both',v=>{jsonBox.hidden=v==='table';tableBox.hidden=v==='json';view.style.gridTemplateColumns=v==='both'?'':'1fr';})),view,h('div',{class:'row'},ask),msg,
+    h('p',{class:'note'},'예시 응답입니다. 실제 메뉴가 아니며, 실제 API는 head(결과 코드·건수)와 더 많은 열(원산지, 영양 정보 등)을 함께 돌려줍니다.'));
+};
+
+LABS.clean=root=>{
+  const raw=[6.5,7,null,5.5,6,24,7.5,6,null,5,6.5,0.5];
+  let miss='drop',out='keep';
+  const isOut=v=>v!=null&&(v<3||v>12);
+  const cells=h('div',{class:'cells'});
+  const sN=stat('사용한 값'),sM=stat('평균 (시간)',true),sMed=stat('중앙값 (시간)');
+  const msg=h('div',{class:'msg'});
+  const pl=plot(root,.22,150,(ctx,W,H)=>{const F=frame(ctx,W,H,{x0:0,x1:25,y0:0,y1:1,xt:[0,3,6,9,12,15,18,21,24],xf:v=>v+'h',b:30,l:20,r:20,t:10});
+    const {vals,info}=compute();
+    ctx.fillStyle=alpha(C('c2'),.10);ctx.fillRect(F.X(0),10,F.X(3)-F.X(0),H-40);ctx.fillRect(F.X(12),10,F.X(25)-F.X(12),H-40);
+    info.forEach((c,i)=>{if(c.v==null||c.gone)return;const y=F.Y(.5)+((i%3)-1)*10;dot(ctx,F.X(c.v),y,6,c.filled?C('accent'):C('fg'),C('surface'),1.5);});
+    const m=vals.reduce((s,v)=>s+v,0)/vals.length;ctx.strokeStyle=C('accent');ctx.lineWidth=2;ctx.setLineDash([5,4]);ctx.beginPath();ctx.moveTo(F.X(m),10);ctx.lineTo(F.X(m),H-30);ctx.stroke();ctx.setLineDash([]);
+    ctx.fillStyle=C('accent');ctx.font='600 12px '+FONT();ctx.textAlign=m>20?'right':'left';ctx.textBaseline='top';ctx.fillText(' 평균 '+fx(m,2)+'h ',F.X(m),12);});
+  function compute(){
+    let info=raw.map(v=>({v,gone:false,filled:false,out:isOut(v)}));
+    if(out==='drop')info.forEach(c=>{if(c.out)c.gone=true;});
+    const base=info.filter(c=>c.v!=null&&!c.gone).map(c=>c.v);
+    const mean=base.reduce((s,v)=>s+v,0)/base.length;
+    info.forEach(c=>{if(c.v==null){if(miss==='drop')c.gone=true;else{c.filled=true;c.v=miss==='mean'?Math.round(mean*100)/100:0;}}});
+    const vals=info.filter(c=>!c.gone).map(c=>c.v);return{info,vals};
+  }
+  function update(){
+    const {info,vals}=compute();cells.innerHTML='';
+    info.forEach((c,i)=>{const o=raw[i];cells.append(h('div',{class:'cell'+(o==null?' miss':'')+(isOut(o)?' out':'')+(c.gone?' gone':'')+(c.filled?' fill':'')},h('span',null,`${i+1}번`),h('b',null,c.filled?fx(c.v,2):o==null?'빈칸':o)));});
+    const s=[...vals].sort((a,b)=>a-b),n=s.length,med=n%2?s[(n-1)/2]:(s[n/2-1]+s[n/2])/2,mean=vals.reduce((a,b)=>a+b,0)/n;
+    sN.set(n+'개');sM.set(fx(mean,2));sMed.set(fx(med,2));
+    const cases={'drop-keep':['bad','이상치 24시간과 0.5시간이 남아 평균이 흔들립니다. 중앙값과 비교해 보세요.'],'drop-drop':['good','결측 행과 이상치(3시간 미만·12시간 초과)를 빼면 평균과 중앙값이 비슷해집니다. 기준을 보고서에 함께 적어야 합니다.'],'mean-keep':['bad','이상치가 포함된 평균으로 빈칸을 채웠습니다. 채운 값 자체가 왜곡되어 있어요.'],'mean-drop':['good','이상치를 뺀 뒤 평균으로 채웠습니다. 데이터 수는 유지되지만 값이 평균 근처로 몰려 퍼짐이 작아 보입니다.'],'zero-keep':['bad','빈칸을 0시간으로 채우면 "한숨도 안 잔 학생"이 두 명 생깁니다. 평균이 실제보다 낮아집니다.'],'zero-drop':['bad','이상치는 뺐지만 빈칸을 0으로 채워 평균이 낮아졌습니다. 0은 "모름"이 아니라 실제 값으로 계산됩니다.']};
+    const [k,t]=cases[miss+'-'+out];msg.className='msg '+k;msg.textContent=t;pl.redraw();
+  }
+  const ctr=h('div',{class:'ctrls'},
+    h('div',null,h('div',{class:'sl-l',style:'font-size:14px;margin-bottom:6px'},'결측치 처리'),seg([['drop','행 삭제'],['mean','평균으로 채우기'],['zero','0으로 채우기']],miss,v=>{miss=v;update();})),
+    h('div',null,h('div',{class:'sl-l',style:'font-size:14px;margin-bottom:6px'},'이상치 (3시간 미만 · 12시간 초과)'),seg([['keep','그대로 두기'],['drop','제외하기']],out,v=>{out=v;update();})));
+  root.prepend(ctr,cells);root.append(h('div',{class:'stats'},sN,sM,sMed),msg,h('p',{class:'note'},'주황 테두리: 이상치 후보 · 파란 기울임 숫자: 채워 넣은 값 · 점선: 현재 평균'));
+  update();
+};
+
+LABS.chart=root=>{
+  const Q=[
+    {id:'time',q:'1년 동안 도서관 대출 권수는 어떻게 변했을까?',labels:['3월','4월','5월','6월','7월','8월','9월','10월','11월','12월','1월','2월'],values:[420,515,380,610,290,120,455,530,600,310,90,140],unit:'권',best:'line',ok:['bar']},
+    {id:'part',q:'우리 반 27명이 고른 희망 진로 분야의 비율은?',labels:['공학','의약','교육','예술','경영','기타'],values:[7,6,5,4,3,2],unit:'명',best:'pie',ok:['bar']},
+    {id:'rel',q:'하루 스마트폰 사용 시간과 수면 시간은 관계가 있을까?',pairs:[[1,8],[1.5,7.6],[2,7.5],[2.5,7],[3,7.2],[3,6.6],[3.5,6.8],[4,6.3],[4,6.5],[4.5,6],[5,5.9],[5.5,5.5],[6,5.6],[6,5.2],[7,4.8]],best:'scatter',ok:[]},
+  ];
+  const TYPES=[['line','꺾은선'],['bar','막대'],['pie','원'],['scatter','산점도']];
+  let qi=0,type='bar';
+  const msg=h('div',{class:'msg'});
+  const pl=plot(root,.5,340,(ctx,W,H)=>{
+    const q=Q[qi];const cA=C('c1'),fg=C('fg'),mu=C('muted');
+    const labels=q.labels||q.pairs.map((_,i)=>`학생${i+1}`),values=q.values||q.pairs.map(p=>p[1]);
+    if(type==='pie'){
+      const tot=values.reduce((a,b)=>a+b,0);let a0=-Math.PI/2;const cx=W*.36,cy=H/2,R=Math.min(H*.4,W*.28);
+      const cols=['c1','c2','c3','c4','c5'];
+      values.forEach((v,i)=>{const a1=a0+v/tot*Math.PI*2;ctx.beginPath();ctx.moveTo(cx,cy);ctx.arc(cx,cy,R,a0,a1);ctx.closePath();ctx.fillStyle=i<5?C(cols[i]):alpha(mu,.4+.04*(i%5));ctx.fill();ctx.strokeStyle=C('surface2');ctx.lineWidth=2;ctx.stroke();a0=a1;});
+      ctx.font='12px '+FONT();ctx.textBaseline='middle';ctx.textAlign='left';
+      const rows=Math.min(labels.length,Math.floor((H-20)/18));
+      for(let i=0;i<rows;i++){const y=H/2-(rows-1)*9+i*18;ctx.fillStyle=i<5?C(cols[i]):alpha(mu,.5);ctx.fillRect(W*.68,y-5,10,10);ctx.fillStyle=fg;ctx.fillText(`${labels[i]}  ${fx(values[i]/tot*100,0)}%`,W*.68+16,y);}
+      if(labels.length>rows){ctx.fillStyle=mu;ctx.fillText(`… 외 ${labels.length-rows}개`,W*.68+16,H/2+rows*9+6);}
+      return;}
+    if(type==='scatter'){
+      const pts=q.pairs||values.map((v,i)=>[i+1,v]);
+      const xs=pts.map(p=>p[0]),ys=pts.map(p=>p[1]);const x0=0,x1=Math.ceil(Math.max(...xs)+1),y0=0,y1=Math.ceil(Math.max(...ys)*1.15);
+      const F=frame(ctx,W,H,{x0,x1,y0,y1,xt:ticks(x0,x1),yt:ticks(y0,y1),xl:q.pairs?'스마트폰 사용 시간(h)':'순서',yl:q.pairs?'수면 시간(h)':q.unit,l:52});
+      pts.forEach(p=>dot(ctx,F.X(p[0]),F.Y(p[1]),5.5,cA,C('surface'),1.5));return;}
+    const y1=Math.ceil(Math.max(...values)*1.15/ (q.pairs?1:10))*(q.pairs?1:10);
+    const F=frame(ctx,W,H,{x0:0,x1:labels.length,y0:0,y1,yt:ticks(0,y1),yl:q.unit?`(${q.unit})`:'수면 시간(h)',l:52,b:30});
+    const bw=(F.X(1)-F.X(0));ctx.fillStyle=mu;ctx.font='11px '+FONT();ctx.textAlign='center';ctx.textBaseline='top';
+    labels.forEach((lb,i)=>{if(labels.length<=12||i%2===0)ctx.fillText(q.pairs?String(i+1):lb,F.X(i+.5),H-F.p.b+8);});
+    if(type==='bar'){values.forEach((v,i)=>{ctx.fillStyle=cA;const x=F.X(i)+bw*.18,w=bw*.64;ctx.beginPath();ctx.roundRect(x,F.Y(v),w,F.Y(0)-F.Y(v),[5,5,0,0]);ctx.fill();});}
+    else{ctx.strokeStyle=cA;ctx.lineWidth=2.5;ctx.beginPath();values.forEach((v,i)=>{const x=F.X(i+.5),y=F.Y(v);i?ctx.lineTo(x,y):ctx.moveTo(x,y);});ctx.stroke();values.forEach((v,i)=>dot(ctx,F.X(i+.5),F.Y(v),4,cA,C('surface2'),2));}
+  });
+  function ticks(a,b){const span=b-a,step=span<=10?(span<=5?1:2):span<=30?5:span<=100?20:100;const r=[];for(let v=a;v<=b+1e-9;v+=step)r.push(Math.round(v*100)/100);return r;}
+  const FB={
+    time:{line:'정답! 시간 순서대로 이어 그려 8월·1월 방학 때 대출이 줄고 시험 기간 전후로 늘어나는 흐름이 잘 보입니다.',bar:'나쁘지 않아요. 달별 크기 비교는 되지만, 흐름(오르내림)은 꺾은선이 더 잘 보여 줍니다.',pie:'원그래프는 "전체 중 비율"을 보여 줍니다. 3월 대출이 1년의 몇 %인지는 이 질문과 상관이 없어요.',scatter:'점만 찍혀 있어 시간의 흐름을 따라 읽기 어렵습니다. 순서가 있는 데이터는 선으로 이어 주세요.'},
+    part:{pie:'정답! 27명 전체를 100%로 두고 각 분야가 차지하는 비율이 한눈에 보입니다. 항목이 6개 이하라 읽기도 쉽습니다.',bar:'좋은 대안입니다. 분야끼리 크기 비교는 막대가 더 정확하지만, "비율" 질문에는 원이나 누적 막대가 더 직접적입니다.',line:'진로 분야 사이에는 순서가 없습니다. 선으로 이으면 "공학에서 의약으로 줄어든다"처럼 잘못 읽힙니다.',scatter:'분야는 수치가 아닌 범주라서 산점도의 가로축으로 쓸 수 없습니다.'},
+    rel:{scatter:'정답! 오른쪽 아래로 내려가는 점들에서 "사용 시간이 길수록 수면이 짧은" 경향(음의 상관)이 보입니다. 단, 원인과 결과는 따로 따져야 해요.',bar:'막대에는 수면 시간만 보이고 스마트폰 사용 시간이 사라졌습니다. 두 변수의 관계는 산점도로 보아야 합니다.',line:'학생 순서대로 선을 이었을 뿐이라 의미 없는 오르내림이 생깁니다. 두 변수를 가로·세로축에 놓아야 해요.',pie:'학생들의 수면 시간을 더한 "전체"는 의미가 없습니다. 원그래프는 이 질문에 맞지 않아요.'}};
+  function update(){const q=Q[qi];const good=type===q.best,ok=q.ok.includes(type);msg.className='msg '+(good?'good':ok?'':'bad');msg.textContent=FB[q.id][type];pl.redraw();}
+  const qsel=h('div',{class:'qgrid'});
+  const qbtns=Q.map((q,i)=>{const b=h('button',{type:'button',class:'qc',style:'text-align:left;cursor:pointer;border:0;font:inherit;color:inherit'},h('span',{class:'eyebrow'},`질문 ${i+1}`),h('p',null,q.q));b.addEventListener('click',()=>{qi=i;qbtns.forEach((x,j)=>x.style.boxShadow=j===i?'inset 0 0 0 2px var(--accent)':'');update();});return b;});
+  qbtns[0].style.boxShadow='inset 0 0 0 2px var(--accent)';qsel.append(...qbtns);
+  root.prepend(qsel,h('div',{class:'row'},h('span',{class:'sl-l',style:'font-size:14px'},'그래프 종류'),seg(TYPES,type,v=>{type=v;update();})));
+  root.append(msg);update();
+};
+
+LABS.reg=root=>{
+  const r=rng(143);const data=[];for(let y=1975;y<=2024;y++)data.push([y,13.55+0.033*(y-1975)+gauss(r)*.42]);
+  const fit=lsq(data.map(d=>[d[0]-1975,d[1]]));
+  let slope=0,bias=14.3,year=2040;
+  const sse=(a,b)=>data.reduce((s,[x,y])=>s+(y-(a*(x-1975)+b))**2,0);
+  const best=sse(fit.a,fit.b);
+  const sS=stat('기울기 (℃/100년)'),sE=stat('제곱오차 합',true),sB=stat('최소 제곱오차 합'),sP=stat('예측 기온');
+  const msg=h('div',{class:'msg'});
+  const pl=plot(root,.5,380,(ctx,W,H)=>{
+    const F=frame(ctx,W,H,{x0:1970,x1:2065,y0:12,y1:17.5,xt:[1975,1990,2005,2024,2040,2060],yt:[12,13,14,15,16,17],yf:v=>v+'℃',xl:'연도',l:48});
+    ctx.fillStyle=alpha(C('accent'),.07);ctx.fillRect(F.X(1975),F.p.t,F.X(2024)-F.X(1975),H-F.p.t-F.p.b);
+    ctx.fillStyle=C('muted');ctx.font='600 11px '+FONT();ctx.textAlign='left';ctx.textBaseline='top';ctx.fillText('학습 기간',F.X(1975)+6,F.p.t+20);
+    const a=slope/100,P=x=>a*(x-1975)+bias;
+    ctx.strokeStyle=alpha(C('bad'),.6);ctx.lineWidth=1.2;data.forEach(([x,y])=>{ctx.beginPath();ctx.moveTo(F.X(x),F.Y(y));ctx.lineTo(F.X(x),F.Y(P(x)));ctx.stroke();});
+    data.forEach(([x,y])=>dot(ctx,F.X(x),F.Y(y),3.6,C('fg')));
+    ctx.save();ctx.beginPath();ctx.rect(F.p.l,F.p.t,W-F.p.l-F.p.r,H-F.p.t-F.p.b);ctx.clip();
+    ctx.strokeStyle=C('accent');ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(F.X(1970),F.Y(P(1970)));ctx.lineTo(F.X(2024),F.Y(P(2024)));ctx.stroke();
+    ctx.setLineDash([6,5]);ctx.beginPath();ctx.moveTo(F.X(2024),F.Y(P(2024)));ctx.lineTo(F.X(2065),F.Y(P(2065)));ctx.stroke();ctx.setLineDash([]);ctx.restore();
+    const py=P(year),inR=year<=2024;ctx.strokeStyle=C('muted');ctx.setLineDash([3,4]);ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(F.X(year),F.p.t);ctx.lineTo(F.X(year),H-F.p.b);ctx.stroke();ctx.setLineDash([]);
+    if(py>12&&py<17.5){dot(ctx,F.X(year),F.Y(py),7,inR?C('accent'):C('c2'),C('surface'),2.5);ctx.fillStyle=C('fg');ctx.font='700 13px '+FONT();ctx.textAlign=year>2045?'right':'left';ctx.textBaseline='bottom';ctx.fillText(` ${year}년 ${fx(py,1)}℃ `,F.X(year),F.Y(py)-10);}
+  });
+  function update(){const e=sse(slope/100,bias);sS.set(sgn(slope,2));sE.set(fx(e,2));sB.set(fx(best,2));sP.set(fx(slope/100*(year-1975)+bias,1)+'℃');
+    const gap=e/best;msg.className='msg '+(gap<1.02?'good':'');
+    msg.textContent=(gap<1.02?'최적에 거의 도달했습니다! ':gap<1.5?'가까워요. 제곱오차 합을 더 줄여 보세요. ':'아직 오차가 큽니다. 직선이 점들 한가운데를 지나도록 움직여 보세요. ')+(year>2024?`${year}년은 학습 기간(1975~2024) 밖이라 외삽입니다. 추세가 그대로 이어진다는 가정이 필요해요.`:`${year}년은 학습 기간 안쪽입니다.`);pl.redraw();}
+  const s1=slider('reg-s','기울기 (℃/100년)',-2,8,.05,slope,v=>sgn(v,2),v=>{slope=v;update();});
+  const s2=slider('reg-b','편향 · 1975년 예측값 (℃)',12,16,.01,bias,v=>fx(v,2)+'℃',v=>{bias=v;update();});
+  const s3=slider('reg-y','예측할 연도',1975,2060,1,year,v=>v+'년',v=>{year=v;update();});
+  const bt=h('button',{type:'button',class:'btn sm'},'최소제곱 직선으로');bt.addEventListener('click',()=>{slope=fit.a*100;bias=fit.b;s1.setVal(slope);s2.setVal(bias);update();});
+  root.prepend(h('div',{class:'ctrls'},s1,s2,s3));
+  root.append(h('div',{class:'stats'},sS,sE,sB,sP),h('div',{class:'row'},bt,h('span',{class:'note'},`상관계수 r = ${fx(fit.r,2)} · 학습한 해 50개`)),msg,
+    h('p',{class:'note'},'점은 대구의 기온 상승 추세를 흉내 낸 수업용 합성 데이터입니다(실제 관측값 아님). 바이브 코딩 실습에서는 기상자료개방포털의 대구(143) 관측 자료를 직접 내려받아 같은 분석을 합니다.'));
+  update();
+};
+
+LABS.metric=root=>{
+  const D=[[1,52],[2,60],[3,71],[4,75],[5,88]];const fit=lsq(D);
+  let a=10,b=40;
+  const tb=h('tbody'),tf=h('tfoot');
+  const sMAE=stat('MAE',true),sMSE=stat('MSE'),sRMSE=stat('RMSE'),sR2=stat('R²');
+  const pl=plot(root,.42,260,(ctx,W,H)=>{const F=frame(ctx,W,H,{x0:0,x1:6,y0:30,y1:100,xt:[0,1,2,3,4,5,6],yt:[30,50,70,90],xl:'공부 시간(h)',yl:'점수',l:40});
+    ctx.strokeStyle=C('bad');ctx.lineWidth=2;D.forEach(([x,y])=>{ctx.beginPath();ctx.moveTo(F.X(x),F.Y(y));ctx.lineTo(F.X(x),F.Y(a*x+b));ctx.stroke();});
+    ctx.save();ctx.beginPath();ctx.rect(F.p.l,F.p.t,W-F.p.l-F.p.r,H-F.p.t-F.p.b);ctx.clip();ctx.strokeStyle=C('accent');ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(F.X(0),F.Y(b));ctx.lineTo(F.X(6),F.Y(a*6+b));ctx.stroke();ctx.restore();
+    D.forEach(([x,y])=>dot(ctx,F.X(x),F.Y(y),5.5,C('fg'),C('surface2'),2));});
+  function update(){
+    tb.innerHTML='';let sa=0,s2=0,st=0;const my=D.reduce((s,d)=>s+d[1],0)/D.length;
+    D.forEach(([x,y])=>{const p=a*x+b,e=y-p;sa+=Math.abs(e);s2+=e*e;st+=(y-my)**2;tb.append(h('tr',null,h('td',null,x),h('td',null,y),h('td',null,fx(p,1)),h('td',{style:`color:var(${e>=0?'--good':'--bad'})`},sgn(e,1)),h('td',null,fx(Math.abs(e),1)),h('td',null,fx(e*e,1))));});
+    const n=D.length;tf.innerHTML='';tf.append(h('tr',null,h('td',{colspan:'4',style:'font-weight:600'},'합계 → 평균'),h('td',null,`${fx(sa,1)} → ${fx(sa/n,2)}`),h('td',null,`${fx(s2,1)} → ${fx(s2/n,2)}`)));
+    sMAE.set(fx(sa/n,2)+'점');sMSE.set(fx(s2/n,2));sRMSE.set(fx(Math.sqrt(s2/n),2)+'점');sR2.set(fx(1-s2/st,3));pl.redraw();}
+  const s1=slider('m-a','기울기 · 1시간당 점수',0,20,.1,a,v=>fx(v,1),v=>{a=v;update();});
+  const s2=slider('m-b','편향 · 0시간일 때 점수',20,60,.1,b,v=>fx(v,1),v=>{b=v;update();});
+  const bt=h('button',{type:'button',class:'btn sm'},'최적 직선으로');bt.addEventListener('click',()=>{a=fit.a;b=fit.b;s1.setVal(a);s2.setVal(b);update();});
+  const table=h('div',{class:'tbl'},h('table',null,h('thead',null,h('tr',null,...['공부 시간 x','실제 점수 y','예측 ŷ','오차 y−ŷ','|오차|','오차²'].map(t=>h('th',null,t)))),tb,tf));
+  root.prepend(h('div',{class:'ctrls'},s1,s2));
+  root.append(h('div',{class:'split'},table,h('div',{class:'stats',style:'grid-template-columns:1fr 1fr'},sMAE,sMSE,sRMSE,sR2)),h('div',{class:'row'},bt,h('span',{class:'note'},`최적 직선: ŷ = ${fx(fit.a,1)}x + ${fx(fit.b,1)}`)));
+  update();
+};
+
+LABS.knn=root=>{
+  const r=rng(8);const pts=[];
+  for(let i=0;i<14;i++)pts.push({x:7+gauss(r)*1.3,y:3+gauss(r)*1.3,c:0});
+  for(let i=0;i<14;i++)pts.push({x:3+gauss(r)*1.3,y:7+gauss(r)*1.3,c:1});
+  pts.forEach(p=>{p.x=Math.min(9.6,Math.max(.4,p.x));p.y=Math.min(9.6,Math.max(.4,p.y));});
+  let q={x:5.4,y:5.1},k=3,showB=true;
+  const NAME=['액션','코미디'];
+  const res=h('div',{class:'msg'});
+  const neigh=(x,y)=>pts.map(p=>({p,d:Math.hypot(p.x-x,p.y-y)})).sort((a,b)=>a.d-b.d).slice(0,k);
+  const vote=ns=>{const c1=ns.filter(n=>n.p.c===1).length;return c1>k/2?1:0;};
+  let F=null;
+  const pl=plot(root,.62,420,(ctx,W,H)=>{
+    F=frame(ctx,W,H,{x0:0,x1:10,y0:0,y1:10,xt:[0,2,4,6,8,10],yt:[0,2,4,6,8,10],xl:'액션 장면 수',yl:'웃음 장면 수',l:36});
+    const cA=C('c1'),cB=C('c2');
+    if(showB){const cs=10;for(let gx=F.p.l;gx<W-F.p.r;gx+=cs)for(let gy=F.p.t;gy<H-F.p.b;gy+=cs){ctx.fillStyle=alpha(vote(neigh(F.ix(gx+cs/2),F.iy(gy+cs/2)))?cB:cA,.13);ctx.fillRect(gx,gy,cs,cs);}}
+    const ns=neigh(q.x,q.y),v=vote(ns);
+    ctx.strokeStyle=C('muted');ctx.lineWidth=1.2;ns.forEach(n=>{ctx.beginPath();ctx.moveTo(F.X(q.x),F.Y(q.y));ctx.lineTo(F.X(n.p.x),F.Y(n.p.y));ctx.stroke();});
+    const R=ns[ns.length-1].d;ctx.setLineDash([4,4]);ctx.beginPath();ctx.ellipse(F.X(q.x),F.Y(q.y),Math.abs(F.X(R)-F.X(0)),Math.abs(F.Y(0)-F.Y(R)),0,0,Math.PI*2);ctx.stroke();ctx.setLineDash([]);
+    pts.forEach(p=>{const isN=ns.some(n=>n.p===p);if(p.c===0)dot(ctx,F.X(p.x),F.Y(p.y),isN?7:5.5,cA,isN?C('fg'):C('surface'),isN?2:1.5);else{const s=isN?7:5.5;ctx.fillStyle=cB;ctx.fillRect(F.X(p.x)-s,F.Y(p.y)-s,s*2,s*2);if(isN){ctx.strokeStyle=C('fg');ctx.lineWidth=2;ctx.strokeRect(F.X(p.x)-s,F.Y(p.y)-s,s*2,s*2);}}});
+    ctx.save();ctx.translate(F.X(q.x),F.Y(q.y));ctx.fillStyle=v?cB:cA;ctx.strokeStyle=C('fg');ctx.lineWidth=2.5;ctx.beginPath();for(let i=0;i<10;i++){const rr=i%2?5:12,a=-Math.PI/2+i*Math.PI/5;ctx.lineTo(Math.cos(a)*rr,Math.sin(a)*rr);}ctx.closePath();ctx.fill();ctx.stroke();ctx.restore();
+    const c1=ns.filter(n=>n.p.c===1).length;res.className='msg';res.innerHTML='';res.append(h('b',null,`새 영화(액션 ${fx(q.x,1)}, 웃음 ${fx(q.y,1)}) → ${NAME[v]}`),`  ·  가까운 ${k}편 중 액션 ${k-c1}편, 코미디 ${c1}편`);
+  });
+  pl.canvas.style.cursor='crosshair';
+  pl.canvas.addEventListener('click',e=>{if(!F)return;const b=pl.canvas.getBoundingClientRect();q={x:Math.min(10,Math.max(0,F.ix(e.clientX-b.left))),y:Math.min(10,Math.max(0,F.iy(e.clientY-b.top)))};pl.redraw();});
+  root.prepend(h('div',{class:'ctrls'},slider('knn-k','이웃 수 k',1,15,2,k,v=>v+'편',v=>{k=v;pl.redraw();}),h('div',null,h('div',{class:'sl-l',style:'font-size:14px;margin-bottom:6px'},'결정 경계'),seg([['on','보이기'],['off','숨기기']],'on',v=>{showB=v==='on';pl.redraw();}))));
+  root.append(res,h('p',{class:'note'},'● 파랑 원: 액션 · ■ 주황 사각형: 코미디 · ★ 새 영화 (그래프를 눌러 옮기기) · 점선 원: k번째 이웃까지의 거리'));
+};
+
+LABS.conf=root=>{
+  const r=rng(9);const M=[];
+  for(let i=0;i<15;i++)M.push({s:Math.min(.98,Math.max(.05,.7+gauss(r)*.15)),y:1});
+  for(let i=0;i<25;i++)M.push({s:Math.min(.95,Math.max(.02,.33+gauss(r)*.15)),y:0});
+  let t=.5;
+  const cm=h('div',{class:'cm'});const sA=stat('정확도'),sP=stat('정밀도',true),sR=stat('재현율',true),sF=stat('F1');
+  const msg=h('div',{class:'msg'});
+  const pl=plot(root,.3,200,(ctx,W,H)=>{const F=frame(ctx,W,H,{x0:0,x1:1,y0:0,y1:2,xt:[0,.2,.4,.6,.8,1],xf:v=>v.toFixed(1),l:78,b:30});
+    ctx.fillStyle=C('muted');ctx.font='600 12px '+FONT();ctx.textAlign='right';ctx.textBaseline='middle';ctx.fillText('실제 스팸',F.p.l-10,F.Y(1.5));ctx.fillText('실제 정상',F.p.l-10,F.Y(.5));
+    ctx.fillStyle=alpha(C('c2'),.10);ctx.fillRect(F.X(t),F.p.t,F.X(1)-F.X(t),H-F.p.t-F.p.b);
+    const jr=rng(3);M.forEach(m=>{const pred=m.s>=t?1:0,ok=pred===m.y,y=F.Y(m.y?1.5:.5)+(jr()-.5)*28;dot(ctx,F.X(m.s),y,5.5,pred?C('c2'):C('c1'),ok?C('surface'):C('bad'),ok?1.5:2.5);});
+    ctx.strokeStyle=C('fg');ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(F.X(t),F.p.t);ctx.lineTo(F.X(t),H-F.p.b);ctx.stroke();
+    ctx.fillStyle=C('fg');ctx.textAlign=t>.8?'right':'left';ctx.textBaseline='top';ctx.fillText(t>.8?'임계값 '+t.toFixed(2)+' ':' 임계값 '+t.toFixed(2),F.X(t),F.p.t);});
+  function update(){
+    let TP=0,FP=0,FN=0,TN=0;M.forEach(m=>{const p=m.s>=t;if(p&&m.y)TP++;else if(p)FP++;else if(m.y)FN++;else TN++;});
+    cm.innerHTML='';const cell=(n,lab,cls)=>h('div',{class:'v '+cls},h('b',null,n),lab);
+    cm.append(h('div',null),h('div',{class:'h'},'스팸이라고 예측'),h('div',{class:'h'},'정상이라고 예측'),
+      h('div',{class:'h'},'실제 스팸'),cell(TP,'TP 잡아냄','t'),cell(FN,'FN 놓침','f'),
+      h('div',{class:'h'},'실제 정상'),cell(FP,'FP 정상을 버림','f'),cell(TN,'TN 통과','t'));
+    const acc=(TP+TN)/M.length,pre=TP+FP?TP/(TP+FP):0,rec=TP/(TP+FN),f1=pre+rec?2*pre*rec/(pre+rec):0;
+    const pc=v=>fx(v*100,0)+'%';sA.set(pc(acc));sP.set(TP+FP?pc(pre):'–');sR.set(pc(rec));sF.set(fx(f1,2));
+    msg.className='msg '+(FP===0&&rec>.5?'good':FP>3?'bad':'');
+    msg.textContent=FP===0?`정상 메일을 하나도 버리지 않았습니다(정밀도 100%). 대신 스팸 ${FN}통이 받은편지함으로 들어옵니다.`:`정상 메일 ${FP}통이 스팸함으로 갔습니다. 그중에 합격 통지가 있다면? 임계값을 올리면 FP는 줄고 FN은 늘어납니다.`;
+    pl.redraw();}
+  root.prepend(slider('cf-t','임계값 · 이 점수 이상이면 스팸',0.05,0.95,.01,t,v=>v.toFixed(2),v=>{t=v;update();}));
+  root.append(h('div',{class:'split'},cm,h('div',{class:'stats',style:'grid-template-columns:1fr 1fr'},sA,sP,sR,sF)),msg,h('p',{class:'note'},'점 색: 모델의 예측(주황=스팸, 파랑=정상) · 빨간 테두리: 틀린 예측 · 가로 위치: 모델이 매긴 스팸 점수'));
+  update();
+};
+
+LABS.kmeans=root=>{
+  let seed=10,k=3,pts=[],cents=[],asg=[],phase='assign',iter=0,trail=[],timer=0;
+  const sI=stat('반복'),sS=stat('군집 내 제곱합',true),sP=stat('다음 단계');
+  const msg=h('div',{class:'msg'});
+  const cols=()=>['c1','c2','c3','c4','c5'].map(C);
+  function gen(){const r=rng(seed);pts=[];const centers=[[2.5,7],[7,7.5],[5,2.5],[8,3]].slice(0,3+(seed%2));centers.forEach(([cx,cy])=>{for(let i=0;i<18;i++)pts.push({x:Math.min(9.7,Math.max(.3,cx+gauss(r)*1)),y:Math.min(9.7,Math.max(.3,cy+gauss(r)*1))});});reset();}
+  function reset(){const r=rng(seed*7+k);cents=[];for(let i=0;i<k;i++){const p=pts[Math.floor(r()*pts.length)];cents.push({x:p.x+.01*i,y:p.y});}trail=cents.map(c=>[{...c}]);asg=pts.map(()=>-1);phase='assign';iter=0;stopAuto();update();}
+  function step(){
+    if(phase==='assign'){asg=pts.map(p=>{let bi=0,bd=1e9;cents.forEach((c,i)=>{const d=(p.x-c.x)**2+(p.y-c.y)**2;if(d<bd){bd=d;bi=i;}});return bi;});phase='update';}
+    else{let moved=0;cents.forEach((c,i)=>{const m=pts.filter((_,j)=>asg[j]===i);if(m.length){const nx=m.reduce((s,p)=>s+p.x,0)/m.length,ny=m.reduce((s,p)=>s+p.y,0)/m.length;moved+=Math.hypot(nx-c.x,ny-c.y);c.x=nx;c.y=ny;trail[i].push({x:nx,y:ny});}});iter++;phase=moved<1e-6?'done':'assign';}
+    update();return phase!=='done';}
+  function sse(){return asg[0]<0?null:pts.reduce((s,p,j)=>s+(p.x-cents[asg[j]].x)**2+(p.y-cents[asg[j]].y)**2,0);}
+  const pl=plot(root,.62,420,(ctx,W,H)=>{const F=frame(ctx,W,H,{x0:0,x1:10,y0:0,y1:10,xt:[0,2,4,6,8,10],yt:[0,2,4,6,8,10],xl:'특성 1',yl:'특성 2',l:36});const cs=cols();
+    pts.forEach((p,j)=>{if(asg[j]>=0){ctx.strokeStyle=alpha(cs[asg[j]],.25);ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(F.X(p.x),F.Y(p.y));ctx.lineTo(F.X(cents[asg[j]].x),F.Y(cents[asg[j]].y));ctx.stroke();}});
+    pts.forEach((p,j)=>dot(ctx,F.X(p.x),F.Y(p.y),5,asg[j]<0?C('muted'):cs[asg[j]],C('surface'),1.2));
+    trail.forEach((tr,i)=>{ctx.strokeStyle=cs[i];ctx.lineWidth=2;ctx.setLineDash([4,4]);ctx.beginPath();tr.forEach((q,n)=>n?ctx.lineTo(F.X(q.x),F.Y(q.y)):ctx.moveTo(F.X(q.x),F.Y(q.y)));ctx.stroke();ctx.setLineDash([]);});
+    cents.forEach((c,i)=>{ctx.save();ctx.translate(F.X(c.x),F.Y(c.y));ctx.rotate(Math.PI/4);ctx.fillStyle=cs[i];ctx.strokeStyle=C('fg');ctx.lineWidth=2.5;ctx.fillRect(-9,-9,18,18);ctx.strokeRect(-9,-9,18,18);ctx.restore();});});
+  function update(){sI.set(iter+'회');const s=sse();sS.set(s==null?'–':fx(s,1));sP.set(phase==='assign'?'점 할당':phase==='update'?'중심 이동':'수렴 완료');
+    msg.className='msg'+(phase==='done'?' good':'');msg.textContent=phase==='done'?`${iter}번 반복 후 중심이 더 이상 움직이지 않습니다. ‘다른 시작점’을 눌러 결과가 같은지 확인해 보세요.`:phase==='assign'?'다음 단계: 모든 점을 가장 가까운 중심(◆)의 색으로 칠합니다.':'다음 단계: 각 중심을 같은 색 점들의 평균 위치로 옮깁니다. 점선은 중심이 지나온 길입니다.';pl.redraw();}
+  function stopAuto(){clearInterval(timer);timer=0;auto.textContent='끝까지 실행';}
+  const one=h('button',{type:'button',class:'btn sm'},'한 단계');one.addEventListener('click',()=>{stopAuto();step();});
+  const auto=h('button',{type:'button',class:'btn sm soft'},'끝까지 실행');auto.addEventListener('click',()=>{if(timer){stopAuto();return;}auto.textContent='멈춤';timer=setInterval(()=>{if(!step()||!root.isConnected)stopAuto();},450);});
+  const re=h('button',{type:'button',class:'btn sm ghost'},'다른 시작점');re.addEventListener('click',()=>{seed+=0;const r=rng(Date.now()%1e6);cents=cents.map(()=>{const p=pts[Math.floor(r()*pts.length)];return{x:p.x,y:p.y};});trail=cents.map(c=>[{...c}]);asg=pts.map(()=>-1);phase='assign';iter=0;stopAuto();update();});
+  const nd=h('button',{type:'button',class:'btn sm ghost'},'새 데이터');nd.addEventListener('click',()=>{seed++;gen();});
+  root.prepend(h('div',{class:'ctrls'},h('div',null,h('div',{class:'sl-l',style:'font-size:14px;margin-bottom:6px'},'군집 개수 k'),seg([[2,'2'],[3,'3'],[4,'4'],[5,'5']],3,v=>{k=v;reset();})),h('div',{class:'row'},one,auto,re,nd)));
+  root.append(h('div',{class:'stats'},sI,sP,sS),msg);
+  gen();
+};
+
+LABS.perc=root=>{
+  const T={AND:[0,0,0,1],OR:[0,1,1,1],NAND:[1,1,1,0],XOR:[0,1,1,0]};const X=[[0,0],[0,1],[1,0],[1,1]];
+  let tg='AND',w1=.5,w2=.5,b=-.2,timer=0,epoch=0;
+  const tb=h('tbody');const msg=h('div',{class:'msg'});
+  const out=(x)=>w1*x[0]+w2*x[1]+b>=0?1:0;
+  const pl=plot(root,.8,320,(ctx,W,H)=>{const F=frame(ctx,W,H,{x0:-.5,x1:1.5,y0:-.5,y1:1.5,xt:[0,1],yt:[0,1],xl:'x₁',yl:'x₂',l:36});
+    const cs=10;for(let gx=F.p.l;gx<W-F.p.r;gx+=cs)for(let gy=F.p.t;gy<H-F.p.b;gy+=cs){const x=F.ix(gx+cs/2),y=F.iy(gy+cs/2);ctx.fillStyle=alpha(w1*x+w2*y+b>=0?C('c2'):C('c1'),.12);ctx.fillRect(gx,gy,cs,cs);}
+    if(Math.abs(w2)>1e-6||Math.abs(w1)>1e-6){ctx.save();ctx.beginPath();ctx.rect(F.p.l,F.p.t,W-F.p.l-F.p.r,H-F.p.t-F.p.b);ctx.clip();ctx.strokeStyle=C('fg');ctx.lineWidth=2.5;ctx.beginPath();
+      if(Math.abs(w2)>1e-6){ctx.moveTo(F.X(-.5),F.Y((-b-w1*-.5)/w2));ctx.lineTo(F.X(1.5),F.Y((-b-w1*1.5)/w2));}else{const x=-b/w1;ctx.moveTo(F.X(x),F.Y(-.5));ctx.lineTo(F.X(x),F.Y(1.5));}ctx.stroke();ctx.restore();}
+    X.forEach((x,i)=>{const tgt=T[tg][i],ok=out(x)===tgt;dot(ctx,F.X(x[0]),F.Y(x[1]),13,tgt?C('c2'):C('c1'),ok?C('surface'):C('bad'),ok?2:4);ctx.fillStyle=C('surface');ctx.font='700 12px '+FONT();ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(tgt,F.X(x[0]),F.Y(x[1]));});});
+  function update(){tb.innerHTML='';let c=0;X.forEach((x,i)=>{const s=w1*x[0]+w2*x[1]+b,o=s>=0?1:0,tgt=T[tg][i],ok=o===tgt;if(ok)c++;tb.append(h('tr',null,h('td',null,x[0]),h('td',null,x[1]),h('td',null,fx(s,2)),h('td',null,h('b',null,o)),h('td',null,tgt),h('td',{style:`color:var(${ok?'--good':'--bad'});font-weight:700`},ok?'맞음':'틀림')));});
+    msg.className='msg '+(c===4?'good':'');msg.textContent=c===4?`${tg} 완성! 경계 직선 하나로 1과 0이 깔끔하게 나뉘었습니다.`:tg==='XOR'&&epoch>=30?`${epoch} 에포크가 지나도 ${c}/4에서 멈췄습니다. XOR의 1(주황)과 0(파랑)은 직선 하나로 나눌 수 없어요. 퍼셉트론을 여러 층으로 쌓아야 합니다.`:`${c} / 4 맞힘${epoch?` · ${epoch} 에포크`:''}`;pl.redraw();}
+  const sw1=slider('p-w1','가중치 w₁',-2,2,.1,w1,v=>fx(v,1),v=>{w1=v;update();});
+  const sw2=slider('p-w2','가중치 w₂',-2,2,.1,w2,v=>fx(v,1),v=>{w2=v;update();});
+  const sb=slider('p-b','편향 b',-3,3,.1,b,v=>fx(v,1),v=>{b=v;update();});
+  function stop(){clearInterval(timer);timer=0;tr.textContent='자동 학습';}
+  const tr=h('button',{type:'button',class:'btn sm'},'자동 학습');
+  tr.addEventListener('click',()=>{if(timer){stop();return;}w1=0;w2=0;b=0;epoch=0;tr.textContent='멈춤';timer=setInterval(()=>{let err=0;X.forEach((x,i)=>{const e=T[tg][i]-out(x);if(e){err++;w1+=.1*e*x[0];w2+=.1*e*x[1];b+=.1*e;}});w1=Math.round(w1*10)/10;w2=Math.round(w2*10)/10;b=Math.round(b*10)/10;epoch++;sw1.setVal(w1);sw2.setVal(w2);sb.setVal(b);update();if(!err||epoch>=30||!root.isConnected)stop();},220);});
+  root.prepend(h('div',{class:'row'},h('span',{class:'sl-l',style:'font-size:14px'},'목표 연산'),seg([['AND','AND'],['OR','OR'],['NAND','NAND'],['XOR','XOR']],tg,v=>{tg=v;epoch=0;stop();update();}),tr),h('div',{class:'ctrls'},sw1,sw2,sb));
+  root.append(h('div',{class:'split'},h('div',{class:'tbl'},h('table',null,h('thead',null,h('tr',null,...['x₁','x₂','가중합','출력','정답',''].map(t=>h('th',null,t)))),tb)),msg));
+  update();
+};
+
+LABS.bias=root=>{
+  let share=.85,evalMode='mirror';
+  const acc=s=>.55+.40*(1-Math.exp(-s*5));
+  const sAll=stat('전체 정확도',true),sA=stat('집단 A 정확도'),sB=stat('집단 B 정확도'),sG=stat('정확도 차이');
+  const msg=h('div',{class:'msg'});
+  const pl=plot(root,.36,240,(ctx,W,H)=>{const aA=acc(share),aB=acc(1-share),all=evalMode==='mirror'?share*aA+(1-share)*aB:(aA+aB)/2;
+    const F=frame(ctx,W,H,{x0:0,x1:1,y0:0,y1:3,l:110,r:60,b:30,xt:[0,.25,.5,.75,1],xf:v=>v*100+'%'});
+    [['전체',all,C('fg')],['집단 A',aA,C('c1')],['집단 B',aB,C('c2')]].forEach(([lab,v,col],i)=>{const y=F.Y(2.5-i),hh=(F.Y(0)-F.Y(1))*.5;ctx.fillStyle=col;ctx.beginPath();ctx.roundRect(F.X(0),y-hh/2,F.X(v)-F.X(0),hh,6);ctx.fill();
+      ctx.fillStyle=C('muted');ctx.font='600 13px '+FONT();ctx.textAlign='right';ctx.textBaseline='middle';ctx.fillText(lab,F.p.l-10,y);ctx.fillStyle=C('fg');ctx.textAlign='left';ctx.fillText(fx(v*100,1)+'%',F.X(v)+8,y);});});
+  function update(){const aA=acc(share),aB=acc(1-share),all=evalMode==='mirror'?share*aA+(1-share)*aB:(aA+aB)/2;
+    sAll.set(fx(all*100,1)+'%');sA.set(fx(aA*100,1)+'%');sB.set(fx(aB*100,1)+'%');sG.set(fx(Math.abs(aA-aB)*100,1)+'%p');
+    const gap=Math.abs(aA-aB);msg.className='msg '+(gap>.1?'bad':gap>.03?'':'good');
+    msg.textContent=gap<=.03?'두 집단의 데이터가 고르게 들어가 정확도 차이가 작습니다.':evalMode==='mirror'?`전체 정확도 ${fx(all*100,1)}%만 보면 괜찮아 보이지만, 집단 B는 ${fx(aB*100,1)}%에 그칩니다. 평가 데이터도 A가 많아 B의 낮은 성능이 가려졌어요.`:`두 집단을 같은 수로 평가하자 숨어 있던 차이(${fx(gap*100,1)}%p)가 전체 정확도를 끌어내립니다.`;pl.redraw();}
+  root.prepend(h('div',{class:'ctrls'},slider('b-s','학습 데이터 중 집단 A의 비율',.5,.97,.01,share,v=>`A ${fx(v*100,0)}% · B ${fx(100-v*100,0)}%`,v=>{share=v;update();}),
+    h('div',null,h('div',{class:'sl-l',style:'font-size:14px;margin-bottom:6px'},'평가 데이터 구성'),seg([['mirror','학습 데이터와 같은 비율'],['equal','두 집단 같은 수']],evalMode,v=>{evalMode=v;update();}))));
+  root.append(h('div',{class:'stats'},sAll,sA,sB,sG),msg,h('p',{class:'note'},'가상 시뮬레이션입니다. 데이터가 적은 집단일수록 정확도가 낮아지는 경향을 단순한 식으로 나타냈으며, 실제 서비스의 수치가 아닙니다.'));
+  update();
+};
+
+/* ---------- 용어사전 · 프로젝트 ---------- */
+function renderGlossary(){
+  const list=h('div',{class:'gl'});const inp=h('input',{class:'search',id:'gl-q',type:'search',placeholder:'용어나 설명으로 검색 (예: 오차, 레이블)','aria-label':'용어 검색'});
+  const cnt=h('span',{class:'note'});
+  function draw(){const q=inp.value.trim();list.innerHTML='';const f=GLOSS.filter(g=>!q||g[0].includes(q)||g[1].includes(q));cnt.textContent=`${f.length}개`;
+    f.forEach(([t,d,n])=>list.append(h('div',{class:'gi'},h('h4',null,t),h('p',null,d),h('a',{href:'#'+id2(n)},`${n}차시 · ${L[n-1].title} ›`))));
+    if(!f.length)list.append(h('p',{class:'note'},`"${q}"에 맞는 용어가 없습니다. 더 짧은 단어로 검색해 보세요.`));}
+  inp.addEventListener('input',draw);
+  app.append(h('section',{class:'lhero wrap'},h('span',{class:'eyebrow'},'학습 자료'),h('h1',null,'용어사전'),h('p',{class:'tag'},'수업에 나오는 낯선 용어의 뜻을 찾고, 처음 배운 차시로 돌아가 보세요.'),h('div',{class:'row',style:'margin-top:24px'},inp,cnt),list));
+  draw();
+}
+function renderProject(){
+  const steps=[['질문 세우기','우리 학교·대구 지역과 관련해 데이터로 답할 수 있는 질문을 정합니다. 1차시의 좋은 질문 세 조건을 확인합니다.'],
+    ['데이터 모으기','공공데이터, API, 설문 중 알맞은 방법으로 모읍니다. 출처와 수집 날짜, 동의 여부를 기록합니다.'],
+    ['전처리','결측치·이상치 처리 기준을 먼저 정하고 적용합니다. 처리 전후의 데이터 개수를 남깁니다.'],
+    ['분석과 모델','질문에 맞는 그래프를 그리고, 회귀·분류·군집 중 알맞은 모델을 바이브 코딩으로 만듭니다.'],
+    ['평가와 점검','MAE·R² 또는 혼동행렬 지표로 모델을 평가하고, 집단별 차이와 윤리 쟁점을 점검합니다.'],
+    ['공유와 발표','스트림릿 앱을 시연하고, 결론과 한계를 함께 설명합니다. AI 활용 내역도 밝힙니다.']];
+  const CK=['질문이 측정 가능하고 대상·기간이 분명하다.','데이터 출처(기관, 주소, 내려받은 날짜)를 적었다.','개인을 알아볼 수 있는 정보를 지우거나 동의를 받았다.','결측치·이상치 처리 기준을 분석 전에 정하고 기록했다.','질문의 종류(변화·비교·구성·관계)에 맞는 그래프를 골랐다.','그래프에 축 이름, 단위, 출처를 적었다.','모델의 종류(회귀·분류·군집)를 고른 이유를 설명할 수 있다.','평가 지표를 계산하고, 그 숫자의 의미를 말할 수 있다.','학습 범위 밖의 예측(외삽)이나 상관과 인과를 구분해 설명했다.','집단별로 결과가 다르지 않은지 확인했다.','AI가 만든 코드를 실행해 확인했고, 사용한 프롬프트를 첨부했다.','결론과 함께 분석의 한계를 한 가지 이상 밝혔다.'];
+  const saved=new Set(store.get('gbgh-ck',[]));
+  const prog=h('span',{class:'chip'});
+  const upd=()=>{prog.textContent=`${saved.size} / ${CK.length} 확인`;};
+  const ck=h('div',{class:'check'},...CK.map((t,i)=>{const inp=h('input',{type:'checkbox',id:'ck'+i});inp.checked=saved.has(i);inp.addEventListener('change',()=>{inp.checked?saved.add(i):saved.delete(i);store.set('gbgh-ck',[...saved]);upd();});return h('label',{for:'ck'+i},inp,h('span',null,t));}));
+  upd();
+  app.append(h('section',{class:'lhero wrap'},h('span',{class:'eyebrow'},'더 탐구하기'),h('h1',null,'팀 프로젝트'),h('p',{class:'tag'},'우리 주변의 데이터로 질문하고, 모델로 답하고, 그 답을 책임 있게 설명합니다.')),
+    h('section',{class:'block wrap'},h('h2',null,'진행 단계'),h('div',{class:'steps'},...steps.map(([t,d],i)=>h('div',{class:'step'},h('em',null,String(i+1).padStart(2,'0')),h('h4',null,t),h('p',null,d))))),
+    h('section',{class:'block wrap'},h('h2',null,'주제 아이디어'),h('div',{class:'qgrid'},...[['급식','나이스 급식 API로 열량이 높은 날과 남은 음식 설문 결과의 관계 분석'],['기후','대구 일 최고기온으로 폭염일 수 추세를 회귀로 분석하고 2030년 예측'],['학교생활','도서관 대출 기록으로 학년·월별 대출 패턴 군집 분석'],['교통','공공데이터포털 버스 승하차 데이터로 등하교 시간대 혼잡도 비교'],['건강','수면·스마트폰 사용 설문으로 피로도 분류 모델 만들기'],['AI 윤리','이미지 분류 모델을 Teachable Machine으로 만들고 집단별 정확도 점검']].map(([t,d])=>h('div',{class:'qc'},h('span',{class:'eyebrow'},t),h('p',null,d))))),
+    h('section',{class:'block wrap'},h('div',{class:'row',style:'margin-bottom:18px'},h('h2',{style:'font-size:clamp(26px,3.4vw,36px);font-weight:800'},'발표 전 점검표'),prog),h('p',{class:'note',style:'margin-bottom:12px'},'체크한 항목은 이 기기의 브라우저에만 저장됩니다.'),ck),
+    h('div',{class:'wrap'},h('div',{class:'pager'},h('a',{href:'#l12'},'‹ 이전',h('b',null,'12. AI 윤리와 데이터 편향')),h('a',{href:'#units',style:'text-align:right'},'목록 ›',h('b',null,'차시별 교재')))));
+}
+
+route();
+</script>
