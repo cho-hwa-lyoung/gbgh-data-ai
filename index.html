@@ -56,6 +56,24 @@ p{margin:0}
 .nav nav a:hover{opacity:1;text-decoration:none;background:var(--surface2)}
 .nav nav a.on{opacity:1;font-weight:600}
 @media (max-width:560px){.brand small{display:none}.nav nav a{padding:6px 7px}}
+.acct{position:relative;display:inline-flex;align-items:center;gap:6px;margin-left:6px;font-size:13px}
+.acct:empty{display:none}
+.acct .login{border:0;background:var(--surface2);color:var(--fg);border-radius:999px;padding:6px 12px;font-size:13px;font-weight:600;cursor:pointer}
+.acct .err{color:var(--bad);max-width:150px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.acct .av{display:grid;place-items:center;border-radius:50%;background:var(--accent);color:var(--accent-ink);font-weight:600;object-fit:cover;flex:none;user-select:none}
+.acct .pb{border:0;background:transparent;padding:3px;border-radius:50%;cursor:pointer;display:grid;place-items:center;transition:background .15s}
+.acct .pb:hover,.acct .pb[aria-expanded="true"]{background:color-mix(in srgb,var(--fg) 12%,transparent)}
+.acct .menu{position:absolute;right:0;top:calc(100% + 8px);z-index:60;width:min(320px,calc(100vw - 32px));background:var(--surface);color:var(--fg);border:1px solid var(--line);border-radius:24px;box-shadow:var(--shadow);padding:18px 14px 12px;text-align:center;font-size:14px;line-height:1.5}
+.acct .menu .av{margin:0 auto 10px}
+.acct .menu b{display:block;font-size:18px;letter-spacing:-.02em}
+.acct .menu .em{color:var(--muted);font-size:13px;margin:2px 0 14px;overflow-wrap:anywhere}
+.acct .menu .mi{width:100%;border:1px solid var(--line);background:var(--surface);color:var(--fg);border-radius:999px;padding:9px 12px;margin-top:6px;cursor:pointer;font:inherit;font-weight:500}
+.acct .menu .mi:hover{background:var(--surface2)}
+.acct .menu .nt{font-size:11.5px;color:var(--muted);margin-top:10px}
+.gate{position:fixed;inset:0;z-index:70;display:grid;place-items:center;background:rgba(0,0,0,.45);padding:16px}
+.gate>div{background:var(--surface);color:var(--fg);border-radius:20px;padding:26px 24px;max-width:360px;width:100%;display:grid;gap:12px;text-align:center;box-shadow:var(--shadow)}
+.gate p{color:var(--muted);font-size:14px}
+.gate .btn{justify-self:center}
 
 /* buttons & controls */
 .btn{display:inline-flex;align-items:center;gap:6px;border:0;border-radius:999px;padding:11px 20px;font-size:15px;font-weight:600;cursor:pointer;background:var(--accent);color:var(--accent-ink);transition:transform .15s,filter .15s}
@@ -259,6 +277,7 @@ footer .wrap{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}
       <a href="#labs" data-nav="labs">실험실</a>
       <a href="#glossary" data-nav="glossary">용어사전</a>
       <a href="#project" data-nav="project">프로젝트</a>
+      <span id="acct" class="acct"></span>
     </nav>
   </div>
 </header>
@@ -276,7 +295,86 @@ function gauss(r){let u=0,v=0;while(!u)u=r();while(!v)v=r();return Math.sqrt(-2*
 const fx=(v,d=1)=>(Math.round(v*10**d)/10**d).toFixed(d);
 const sgn=(v,d=2)=>(v>=0?'+':'−')+fx(Math.abs(v),d);
 function lsq(pts){const n=pts.length,mx=pts.reduce((s,p)=>s+p[0],0)/n,my=pts.reduce((s,p)=>s+p[1],0)/n;let sxy=0,sxx=0,syy=0;for(const [x,y] of pts){sxy+=(x-mx)*(y-my);sxx+=(x-mx)**2;syy+=(y-my)**2;}const a=sxy/sxx;return{a,b:my-a*mx,r:sxy/Math.sqrt(sxx*syy),mx,my};}
-const store={get(k,d){try{const v=localStorage.getItem(k);return v?JSON.parse(v):d;}catch(e){return d;}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v));}catch(e){}}};
+const store={get(k,d){try{const v=localStorage.getItem(k);return v?JSON.parse(v):d;}catch(e){return d;}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v));}catch(e){}sync.changed(k);}};
+
+/* ---------- 구글 로그인 · 진도 동기화 ----------
+   GitHub 배포본에서만 작동한다 (build.py가 APP_URL·CLIENT_ID를 채운다). 값이 비어 있으면 이 기기에만 저장한다.
+   로그인하면 차시 완료(gbgh-done)와 점검표(gbgh-ck)를 데이터 길잡이와 같은 Apps Script 서버에 저장해, 다른 기기에서도 이어 쓴다. */
+const sync=(()=>{
+  const APP_URL="",CLIENT_ID="",TOKEN_KEY='gbgh-id-token',KEYS=['gbgh-done','gbgh-ck'];
+  const on=/^https:/.test(APP_URL)&&!!CLIENT_ID;
+  const st={on,user:null,token:null,exp:0,gsi:null,timer:0,err:'',waiters:[]};
+  const parseExp=t=>{try{return JSON.parse(atob(t.split('.')[1].replace(/-/g,'+').replace(/_/g,'/'))).exp*1000;}catch(e){return 0;}};
+  const haveToken=()=>st.token&&st.exp-60000>Date.now();
+  function loadGsi(){
+    if(st.gsi)return st.gsi;
+    st.gsi=new Promise((res,rej)=>{if(window.google&&google.accounts&&google.accounts.id)return res();const s=document.createElement('script');s.src='https://accounts.google.com/gsi/client';s.async=true;s.defer=true;s.onload=()=>res();s.onerror=()=>rej(new Error('구글 로그인 스크립트를 불러오지 못했어요.'));document.head.appendChild(s);})
+      .then(()=>google.accounts.id.initialize({client_id:CLIENT_ID,callback:r=>gotToken(r.credential),auto_select:true,cancel_on_tap_outside:false,itp_support:true,use_fedcm_for_prompt:true}));
+    return st.gsi;
+  }
+  async function api(fn,args){
+    const res=await fetch(APP_URL,{method:'POST',body:JSON.stringify({token:st.token,fn,args:args||[]}),headers:{'Content-Type':'text/plain;charset=utf-8'},redirect:'follow'});
+    const out=JSON.parse(await res.text());
+    if(out.ok)return out.result;
+    const m=/\[([a-z_]+)\]\s*([\s\S]*)$/.exec(String(out.error||''));const e=new Error(m?m[2]:out.error);e.code=m?m[1]:'server';
+    if(e.code==='token_expired'){st.token=null;st.exp=0;try{sessionStorage.removeItem(TOKEN_KEY);}catch(x){}}
+    throw e;
+  }
+  let gate=null;
+  function showGate(msg){
+    if(!gate){gate=h('div',{class:'gate',role:'dialog','aria-label':'로그인'},h('div',null,h('b',{style:'font-size:19px'},'경북여고 데이터·AI 교실'),h('p',{id:'gate-msg'},'학교 구글 계정으로 로그인하면 완료한 차시와 점검표를 다른 기기에서도 이어 볼 수 있어요.'),h('div',{id:'gate-btn',style:'display:flex;justify-content:center'}),h('button',{type:'button',class:'btn ghost sm',onclick:()=>hideGate()},'나중에')));document.body.append(gate);
+      loadGsi().then(()=>google.accounts.id.renderButton($('#gate-btn'),{theme:'outline',size:'large',text:'signin_with',shape:'pill',locale:'ko'})).catch(e=>{$('#gate-msg').textContent=e.message;});}
+    if(msg)$('#gate-msg').textContent=msg;gate.style.display='grid';
+  }
+  function hideGate(){if(gate)gate.style.display='none';}
+  async function gotToken(t){
+    st.token=t;st.exp=parseExp(t);try{sessionStorage.setItem(TOKEN_KEY,t);}catch(e){}
+    hideGate();
+    try{
+      const r=await api('api_siteGet');
+      st.user=r;st.err='';
+      const merged={};KEYS.forEach(k=>{const key=k.slice(5);const local=new Set(store.get(k,[])),remote=r.data&&r.data[key]||[];remote.forEach(v=>local.add(v));merged[key]=[...local].sort((a,b)=>a-b);try{localStorage.setItem(k,JSON.stringify(merged[key]));}catch(e){}});
+      await api('api_siteSet',[merged]);
+      route();
+    }catch(e){st.user=null;st.err=e.message;renderAcct();}
+    st.waiters.splice(0).forEach(f=>f());
+  }
+  function push(){clearTimeout(st.timer);st.timer=setTimeout(async()=>{if(!st.user||!haveToken())return;try{await api('api_siteSet',[{done:store.get('gbgh-done',[]),ck:store.get('gbgh-ck',[])}]);}catch(e){st.err=e.message;renderAcct();}},800);}
+  function logout(){st.user=null;st.token=null;st.exp=0;try{sessionStorage.removeItem(TOKEN_KEY);}catch(e){}try{if(window.google&&google.accounts)google.accounts.id.disableAutoSelect();}catch(e){}route();}
+  const profile=()=>{try{return JSON.parse(atob(st.token.split('.')[1].replace(/-/g,'+').replace(/_/g,'/')));}catch(e){return {};}};
+  function avatar(size,p,initial){ // 구글 계정 사진이 있으면 사진, 없으면 이름 첫 글자
+    const el=h(p.picture?'img':'span',{class:'av',style:`width:${size}px;height:${size}px;font-size:${Math.round(size*.45)}px`},p.picture?null:initial);
+    if(p.picture){el.src=p.picture;el.alt='';el.referrerPolicy='no-referrer';el.onerror=()=>el.replaceWith(h('span',{class:'av',style:el.style.cssText},initial));}
+    return el;
+  }
+  async function login(){
+    try{await loadGsi();}catch(e){showGate(e.message);return;}
+    google.accounts.id.prompt(n=>{if(!haveToken()&&n&&((n.isNotDisplayed&&n.isNotDisplayed())||(n.isSkippedMoment&&n.isSkippedMoment())))showGate();});
+    setTimeout(()=>{if(!haveToken())showGate();},2500);
+  }
+  function renderAcct(){ // 구글 서비스의 계정 버튼과 같은 방식: 동그란 프로필 → 이름·이메일·로그아웃 카드
+    const a=$('#acct');if(!a||!on)return;a.innerHTML='';
+    if(!st.user){a.append(h('button',{type:'button',class:'login',onclick:login},'로그인'));if(st.err)a.append(h('span',{class:'err',title:st.err},st.err));return;}
+    const p=profile(),u=st.user,name=p.name||u.name||u.email.split('@')[0],initial=(name||u.email).trim().charAt(0).toUpperCase();
+    const btn=h('button',{type:'button',class:'pb',title:u.email,'aria-label':'계정: '+u.email,'aria-haspopup':'true','aria-expanded':'false'},avatar(32,p,initial));
+    const menu=h('div',{class:'menu',role:'menu',hidden:true},avatar(72,p,initial),h('b',null,(name.length>1?name+'님, ':'')+'안녕하세요'),h('div',{class:'em'},u.email),
+      h('div',{class:'nt',style:'margin:0 0 12px'},u.teacher?'교사 계정':'학생 계정 · 완료한 차시와 점검표가 이 계정에 저장돼요'),
+      h('button',{type:'button',class:'mi',role:'menuitem',onclick:()=>{close();logout();login();}},'다른 계정으로 로그인'),
+      h('button',{type:'button',class:'mi',role:'menuitem',onclick:()=>{close();logout();}},'로그아웃'),
+      h('div',{class:'nt'},'로그아웃해도 이 기기의 기록은 남아요'));
+    const onDoc=e=>{if(!a.contains(e.target))close();},onKey=e=>{if(e.key==='Escape'){close();btn.focus();}};
+    function open(){menu.hidden=false;btn.setAttribute('aria-expanded','true');setTimeout(()=>document.addEventListener('click',onDoc),0);document.addEventListener('keydown',onKey);}
+    function close(){menu.hidden=true;btn.setAttribute('aria-expanded','false');document.removeEventListener('click',onDoc);document.removeEventListener('keydown',onKey);}
+    btn.addEventListener('click',()=>menu.hidden?open():close());
+    a.append(btn,menu);
+  }
+  function boot(){
+    if(!on)return;
+    try{const t=sessionStorage.getItem(TOKEN_KEY);if(t&&parseExp(t)-60000>Date.now()){gotToken(t);return;}}catch(e){}
+    loadGsi().then(()=>google.accounts.id.prompt()).catch(()=>{}); // 자동 로그인만 시도하고, 안 되면 조용히 '로그인' 버튼만 둔다
+  }
+  return{on,boot,renderAcct,changed(k){if(on&&KEYS.includes(k))push();},get user(){return st.user;}};
+})();
 
 const redrawers=new Set();
 function plot(parent,ratio,maxH,draw){
@@ -559,6 +657,7 @@ function route(){
   redrawers.clear();if(heroStop){heroStop();heroStop=null;}
   app.innerHTML='';
   document.querySelectorAll('[data-nav]').forEach(a=>a.classList.toggle('on',a.dataset.nav===t||(t.startsWith('l')&&/^l\d\d$/.test(t)&&a.dataset.nav==='units')));
+  sync.renderAcct();
   const m=/^l(\d\d)$/.exec(t);
   if(m&&L[+m[1]-1]){renderLesson(L[+m[1]-1]);window.scrollTo(0,0);}
   else if(t==='glossary'){renderGlossary();window.scrollTo(0,0);}
@@ -585,7 +684,7 @@ function renderHome(){
   heroStop=buildHero(stage);
 
   const doneN=d.size, pct=doneN/L.length, R=20, circ=2*Math.PI*R;
-  const ring=h('div',{class:'progress',html:`<svg width="48" height="48" viewBox="0 0 48 48" aria-hidden="true"><circle cx="24" cy="24" r="${R}" fill="none" stroke="var(--surface2)" stroke-width="6"/><circle cx="24" cy="24" r="${R}" fill="none" stroke="var(--accent)" stroke-width="6" stroke-linecap="round" stroke-dasharray="${circ}" stroke-dashoffset="${circ*(1-pct)}" transform="rotate(-90 24 24)"/></svg><div><b>${doneN} / ${L.length}</b><span>완료한 차시<br>이 기기에 저장됩니다</span></div>`});
+  const ring=h('div',{class:'progress',html:`<svg width="48" height="48" viewBox="0 0 48 48" aria-hidden="true"><circle cx="24" cy="24" r="${R}" fill="none" stroke="var(--surface2)" stroke-width="6"/><circle cx="24" cy="24" r="${R}" fill="none" stroke="var(--accent)" stroke-width="6" stroke-linecap="round" stroke-dasharray="${circ}" stroke-dashoffset="${circ*(1-pct)}" transform="rotate(-90 24 24)"/></svg><div><b>${doneN} / ${L.length}</b><span>완료한 차시<br>${sync.user?'구글 계정에 저장됩니다':sync.on?'로그인하면 다른 기기에서도 이어집니다':'이 기기에 저장됩니다'}</span></div>`});
   const sec=h('section',{class:'sec wrap',id:'units'},
     h('div',{class:'sec-h'},h('div',null,h('span',{class:'eyebrow'},'차시별 교재'),h('h2',null,'세 단원, 열두 차시.')),ring));
   UNITS.forEach(u=>{
@@ -1069,9 +1168,10 @@ function renderProject(){
   app.append(h('section',{class:'lhero wrap'},h('span',{class:'eyebrow'},'더 탐구하기'),h('h1',null,'팀 프로젝트'),h('p',{class:'tag'},'우리 주변의 데이터로 질문하고, 모델로 답하고, 그 답을 책임 있게 설명합니다.')),
     h('section',{class:'block wrap'},h('h2',null,'진행 단계'),h('div',{class:'steps'},...steps.map(([t,d],i)=>h('div',{class:'step'},h('em',null,String(i+1).padStart(2,'0')),h('h4',null,t),h('p',null,d))))),
     h('section',{class:'block wrap'},h('h2',null,'주제 아이디어'),h('div',{class:'qgrid'},...[['급식','나이스 급식 API로 열량이 높은 날과 남은 음식 설문 결과의 관계 분석'],['기후','대구 일 최고기온으로 폭염일 수 추세를 회귀로 분석하고 2030년 예측'],['학교생활','도서관 대출 기록으로 학년·월별 대출 패턴 군집 분석'],['교통','공공데이터포털 버스 승하차 데이터로 등하교 시간대 혼잡도 비교'],['건강','수면·스마트폰 사용 설문으로 피로도 분류 모델 만들기'],['AI 윤리','이미지 분류 모델을 Teachable Machine으로 만들고 집단별 정확도 점검']].map(([t,d])=>h('div',{class:'qc'},h('span',{class:'eyebrow'},t),h('p',null,d))))),
-    h('section',{class:'block wrap'},h('div',{class:'row',style:'margin-bottom:18px'},h('h2',{style:'font-size:clamp(26px,3.4vw,36px);font-weight:800'},'발표 전 점검표'),prog),h('p',{class:'note',style:'margin-bottom:12px'},'체크한 항목은 이 기기의 브라우저에만 저장됩니다.'),ck),
+    h('section',{class:'block wrap'},h('div',{class:'row',style:'margin-bottom:18px'},h('h2',{style:'font-size:clamp(26px,3.4vw,36px);font-weight:800'},'발표 전 점검표'),prog),h('p',{class:'note',style:'margin-bottom:12px'},sync.user?'체크한 항목은 로그인한 구글 계정에 저장됩니다.':sync.on?'로그인하면 체크한 항목을 다른 기기에서도 이어 볼 수 있습니다.':'체크한 항목은 이 기기의 브라우저에만 저장됩니다.'),ck),
     h('div',{class:'wrap'},h('div',{class:'pager'},h('a',{href:'#l12'},'‹ 이전',h('b',null,'12. AI 윤리와 데이터 편향')),h('a',{href:'#units',style:'text-align:right'},'목록 ›',h('b',null,'차시별 교재')))));
 }
 
 route();
+sync.boot();
 </script>
