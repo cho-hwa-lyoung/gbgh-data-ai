@@ -341,7 +341,7 @@ const sync=(()=>{
   }
   function push(){clearTimeout(st.timer);st.timer=setTimeout(async()=>{if(!st.user||!haveToken())return;try{await api('api_siteSet',[{done:store.get('gbgh-done',[]),ck:store.get('gbgh-ck',[])}]);}catch(e){st.err=e.message;renderAcct();}},800);}
   function logout(){st.user=null;st.token=null;st.exp=0;try{sessionStorage.removeItem(TOKEN_KEY);}catch(e){}try{if(window.google&&google.accounts)google.accounts.id.disableAutoSelect();}catch(e){}route();}
-  const profile=()=>{try{return JSON.parse(atob(st.token.split('.')[1].replace(/-/g,'+').replace(/_/g,'/')));}catch(e){return {};}};
+  const profile=()=>{try{const b=st.token.split('.')[1].replace(/-/g,'+').replace(/_/g,'/');return JSON.parse(new TextDecoder('utf-8').decode(Uint8Array.from(atob(b),c=>c.charCodeAt(0))));}catch(e){return {};}}; // atob만 쓰면 한글 이름이 깨진다
   function avatar(size,p,initial){ // 구글 계정 사진이 있으면 사진, 없으면 이름 첫 글자
     const el=h(p.picture?'img':'span',{class:'av',style:`width:${size}px;height:${size}px;font-size:${Math.round(size*.45)}px`},p.picture?null:initial);
     if(p.picture){el.src=p.picture;el.alt='';el.referrerPolicy='no-referrer';el.onerror=()=>el.replaceWith(h('span',{class:'av',style:el.style.cssText},initial));}
