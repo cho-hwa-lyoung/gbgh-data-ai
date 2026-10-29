@@ -14,8 +14,8 @@
    - sample: Claude API는 서버가 부르고, 데이터 도구는 이 브라우저에서 실행한다.
    APP_URL과 CLIENT_ID는 build.py가 config.json에서 채운다. */
 (function () {
-  const APP_URL = '';
-  const CLIENT_ID = '';
+  const APP_URL = 'https://script.google.com/macros/s/AKfycbzIwG1PtqFtSFAKGOKa-KRtla7Z40Y0vN_711Hya34Dwj11ZFInf6yUJoUMsbNA-jDT/exec';
+  const CLIENT_ID = '451711767521-dvaqgjjd67ffvckht1el6ite7g0rdpv1.apps.googleusercontent.com';
   if (!/^https:/.test(APP_URL) || !CLIENT_ID) { console.warn('데이터 길잡이: config.json에 APP_URL과 CLIENT_ID를 채운 뒤 build.py를 실행하세요.'); return; }
 
   const POLL = { doc: 15000, config: 20000, list: 10000 };

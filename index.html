@@ -301,7 +301,7 @@ const store={get(k,d){try{const v=localStorage.getItem(k);return v?JSON.parse(v)
    GitHub 배포본에서만 작동한다 (build.py가 APP_URL·CLIENT_ID를 채운다). 값이 비어 있으면 이 기기에만 저장한다.
    로그인하면 차시 완료(gbgh-done)와 점검표(gbgh-ck)를 데이터 길잡이와 같은 Apps Script 서버에 저장해, 다른 기기에서도 이어 쓴다. */
 const sync=(()=>{
-  const APP_URL="",CLIENT_ID="",TOKEN_KEY='gbgh-id-token',KEYS=['gbgh-done','gbgh-ck'];
+  const APP_URL="https://script.google.com/macros/s/AKfycbzIwG1PtqFtSFAKGOKa-KRtla7Z40Y0vN_711Hya34Dwj11ZFInf6yUJoUMsbNA-jDT/exec",CLIENT_ID="451711767521-dvaqgjjd67ffvckht1el6ite7g0rdpv1.apps.googleusercontent.com",TOKEN_KEY='gbgh-id-token',KEYS=['gbgh-done','gbgh-ck'];
   const on=/^https:/.test(APP_URL)&&!!CLIENT_ID;
   const st={on,user:null,token:null,exp:0,gsi:null,timer:0,err:'',waiters:[]};
   const parseExp=t=>{try{return JSON.parse(atob(t.split('.')[1].replace(/-/g,'+').replace(/_/g,'/'))).exp*1000;}catch(e){return 0;}};
