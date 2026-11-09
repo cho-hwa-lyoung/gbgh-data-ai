@@ -454,6 +454,7 @@ window.DG_SITE="teacher";
       try { await loadGsi(); google.accounts.id.disableAutoSelect(); } catch (e) { /* 무시 */ }
       location.reload(); // 화면 상태를 비우고 로그인 창부터 다시 시작한다
     };
+    window.DG_SIGNOUT = signOut;
     menu.append(big, nm, em, role, item('다른 계정으로 로그인', signOut), item('로그아웃', signOut));
     const note = document.createElement('div'); note.textContent = '기록은 이 계정에만 저장돼요'; note.style.cssText = 'font-size:11.5px;color:var(--muted,#6a7684);margin-top:10px';
     menu.appendChild(note);
@@ -984,12 +985,12 @@ function agentTools(){return [
    6. 저장
    ============================================================ */
 let saveTimer=null,saving=Promise.resolve();
-function scheduleSave(){S.me.updatedAt=Date.now();saveLocal("dg-me",S.me);if(S.local)return;clearTimeout(saveTimer);saveTimer=setTimeout(()=>{saving=saving.then(writeMe).catch(()=>{})},1200)}
+function scheduleSave(){if(S.view==="student"&&!hasConsent())return; /* 동의 전에는 아무것도 저장하지 않는다 */S.me.updatedAt=Date.now();saveLocal("dg-me",S.me);if(S.local)return;clearTimeout(saveTimer);saveTimer=setTimeout(()=>{saving=saving.then(writeMe).catch(()=>{})},1200)}
 async function writeMe(){const {nudges,handAck,teacherFb,...body}=S.me;body.updatedAt=Date.now();const ref=S.db.doc("progress/"+S.uid);
   try{if(S.docExists)await ref.update(body);else{await ref.set(body);S.docExists=true}setStatus(true,"저장됨")}
   catch(e){setStatus(false,e.code==="invalid_argument"?"저장하지 못했어요. 페이지를 새로고침해 주세요":"저장 실패 — 잠시 뒤 다시 시도해요")}}
 const chatTimers={};
-function saveChat(id){saveLocal("dg-chat-"+id,S.chats[id].turns.slice(-40));if(S.local)return;clearTimeout(chatTimers[id]);chatTimers[id]=setTimeout(()=>{saving=saving.then(()=>S.db.doc(`progress/${S.uid}/chat/${id}`).set({turns:S.chats[id].turns.slice(-40),updatedAt:Date.now()})).catch(()=>{})},1500)}
+function saveChat(id){if(S.view==="student"&&!hasConsent())return;saveLocal("dg-chat-"+id,S.chats[id].turns.slice(-40));if(S.local)return;clearTimeout(chatTimers[id]);chatTimers[id]=setTimeout(()=>{saving=saving.then(()=>S.db.doc(`progress/${S.uid}/chat/${id}`).set({turns:S.chats[id].turns.slice(-40),updatedAt:Date.now()})).catch(()=>{})},1500)}
 async function loadChat(id){if(S.chats[id])return S.chats[id];S.chats[id]={turns:loadLocal("dg-chat-"+id)||[]};if(!S.local){try{const s=await S.db.doc(`progress/${S.uid}/chat/${id}`).get();if(s.exists)S.chats[id].turns=s.data().turns||[]}catch(e){}}return S.chats[id]}
 async function saveConfig(){saveLocal("dg-config",S.config);if(S.local){toast("이 브라우저에 저장했어요");return}
   try{await S.db.doc("config/class").set({...S.config,updatedAt:Date.now()});toast("학생 화면에 적용했어요")}catch(e){toast("저장하지 못했어요: 선생님 계정이 필요해요")}}
@@ -1020,9 +1021,14 @@ const PII=[
  {re:/(?<!\d)01[016789][-.\s]?\d{3,4}[-.\s]?\d{4}(?!\d)/,n:"전화번호"},
  {re:/[\w.+-]+@[\w-]+\.[\w.]+/,n:"이메일 주소"},
  {re:/(?<!\d)\d{6}[-\s][1-4]\d{6}(?!\d)/,n:"주민등록번호"}];
+/* 개인정보 수집·이용 동의. 안내 내용을 바꾸면 CONSENT_V를 올려 학생에게 다시 묻는다. */
+const CONSENT_V="2026-1";
+function consentOf(p){const c=p&&p.consent;if(!c)return"none";if(c.withdrawnAt)return"withdrawn";return c.v===CONSENT_V?"ok":"old"}
+function hasConsent(){return consentOf(S.me)==="ok"}
 function piiFound(t){return PII.filter(p=>p.re.test(t||"")).map(p=>p.n)}
 function signals(p){
   const out=[],cur=(p.stages||{})[p.current]||{},f=fluency(p);
+  if(consentOf(p)==="withdrawn")out.push(["bad","동의 철회"]);
   if(p.hand)out.push(["bad","호출"+(p.handNote?": "+p.handNote:"")]);
   if((cur.seek||0)>=3)out.push(["warn","답 요구 "+cur.seek+"회"]);
   if(f.rated>=5&&f.r.adopt/f.rated>.8)out.push(["warn","AI 답 그대로 채택 多"]);
@@ -1293,7 +1299,7 @@ function pHome(){
   const L=S.students,hands=L.filter(p=>p.hand).length,active=L.filter(p=>p.updatedAt&&Date.now()-p.updatedAt<15*60000).length,needs=L.filter(p=>signals(p).length).length,inbox=inboxItems().length;
   const need=[...L].filter(p=>p.hand||signals(p).length).sort((a,b)=>(b.hand?1:0)-(a.hand?1:0)||signals(b).length-signals(a).length).slice(0,8);
   const byStage=STAGES.map(s=>({s,at:L.filter(p=>p.current===s.id&&!(p.stages&&p.stages[s.id]&&p.stages[s.id].done)).length,done:L.filter(p=>p.stages&&p.stages[s.id]&&p.stages[s.id].done).length}));
-  $("#view").innerHTML=`<div class="ph"><div><h1>학급 현황</h1><p>학생 화면의 기록이 10초마다 모여요. 카드를 누르면 노트와 대화를 보고 피드백을 보낼 수 있어요.</p></div></div>${preview()}
+  $("#view").innerHTML=`<div class="ph"><div><h1>학급 현황</h1><p>학생 화면의 기록이 10초마다 모여요. 카드를 누르면 노트와 대화를 보고 피드백을 보낼 수 있어요. 개인정보 수집·이용에 동의한 학생만 기록돼요${L.length?` (동의 ${L.filter(p=>consentOf(p)==="ok").length}명${L.some(p=>consentOf(p)==="withdrawn")?` · 철회 ${L.filter(p=>consentOf(p)==="withdrawn").length}명`:""})`:""}.</p></div></div>${preview()}
    <div class="kpis">${[[L.length,"참여 학생"],[active,"지금 활동 중 (15분)"],[hands,"선생님 호출",hands],[needs,"살펴볼 신호가 있는 학생"],[inbox,"피드백 대기"]].map(([v,l,al])=>`<div class="card kpi ${al?"alert":""}"><div class="v">${v}</div><div class="l">${l}</div></div>`).join("")}</div>
    ${L.length?`<div class="two">
     <div class="card"><div class="spread" style="margin-bottom:8px"><h3>지금 도움이 필요해요</h3><span class="help">호출 → 신호 많은 순</span></div>
@@ -1304,6 +1310,7 @@ function pHome(){
    <div class="spread"><h3>학생 전체</h3><a class="btn sm ghost" href="#/students">학생 목록에서 찾기 →</a></div>
    <div class="sgrid">${sortStudents(L).map(cardHTML).join("")}</div>`:emptyClass()}`;
 }
+function consentLine(p){const c=p.consent,k=consentOf(p);return k==="ok"?`개인정보 동의 ${new Date(c.at).toLocaleDateString("ko-KR")}`:k==="withdrawn"?"개인정보 동의 철회":k==="old"?"이전 안내에 동의(다시 동의 필요)":"개인정보 동의 기록 없음"}
 function sortStudents(L){return [...L].sort((a,b)=>(b.hand?1:0)-(a.hand?1:0)||signals(b).length-signals(a).length||(b.updatedAt||0)-(a.updatedAt||0))}
 function cardHTML(p){const f=fluency(p),pr=S.profiles[p.id];return `<a class="scard ${p.hand?"hand":""}" href="#/s/${encodeURIComponent(p.id)}">
   <div class="sc-top"><span class="av ${p.hand?"hand":""}">${esc(stuName(p).trim().charAt(0))}</span><div class="nm" style="min-width:0;flex:1"><b style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(stuName(p))}</b><small>${esc(pr&&pr.email?pr.email:"")}</small></div><small class="muted" style="white-space:nowrap;font-size:11.5px">${ago(p.updatedAt)}</small></div>
@@ -1333,7 +1340,8 @@ async function pStudent(){
   const auto=autoFindings(sid,x,p),hist=[...(p.nudges||[])].reverse();
   const qa=(q,a)=>`<div class="qa"><span class="q">${esc(q)}</span><span class="a ${a&&String(a).trim()?"":"empty-a"}">${a&&String(a).trim()?esc(a):"아직 쓰지 않았어요"}</span></div>`;
   const draft=S.draft[p.id]||"";
-  $("#view").innerHTML=`<div class="ph"><div><a href="#/students" class="btn sm ghost" style="margin-left:-10px">← 학생 목록</a><h1 style="margin-top:6px">${esc(stuName(p))}</h1><p>${esc(pr.email||"")} · 마지막 활동 ${ago(p.updatedAt)}</p></div><div class="row">${stageChip(p)}${pipsHTML(p)}</div></div>
+  $("#view").innerHTML=`<div class="ph"><div><a href="#/students" class="btn sm ghost" style="margin-left:-10px">← 학생 목록</a><h1 style="margin-top:6px">${esc(stuName(p))}</h1><p>${esc(pr.email||"")} · 마지막 활동 ${ago(p.updatedAt)} · ${consentLine(p)}</p></div><div class="row">${stageChip(p)}${pipsHTML(p)}</div></div>
+   ${consentOf(p)==="withdrawn"?`<div class="notice warm"><p><b>이 학생이 개인정보 수집·이용 동의를 철회했어요</b> (${new Date(p.consent.withdrawnAt).toLocaleString("ko-KR")}). 기록 시트에서 이 학생의 이메일이 있는 행(진행·대화·이력·AI 기록)을 지워 주세요. 학생이 다시 동의하면 새로 기록돼요.</p></div>`:""}
    ${p.hand?`<div class="notice warm"><p><b>선생님을 호출했어요</b>${p.handNote?" · "+esc(p.handNote):""} · ${ago(p.handAt)}</p><button class="btn sm primary" data-act="ack">확인 처리</button></div>`:""}
    <div class="detail"><div class="stack">
     <span class="seg" role="tablist" aria-label="차시">${STAGES.map(t=>{const d=p.stages&&p.stages[t.id]&&p.stages[t.id].done;return `<button role="tab" aria-selected="${t.id===sid}" data-act="dstage" data-id="${t.id}">${t.lesson}차시${d?" ✓":t.id===p.current?" •":""}</button>`}).join("")}</span>
