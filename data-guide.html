@@ -429,6 +429,7 @@
       close();
       token = null; tokenExp = 0; who = null;
       try { sessionStorage.removeItem(TOKEN_KEY); } catch (e) { /* 무시 */ }
+      try { Object.keys(localStorage).filter(k => /^dg-(me|data|chat-|owner)/.test(k)).forEach(k => localStorage.removeItem(k)); } catch (e) { /* 무시 */ }
       try { await loadGsi(); google.accounts.id.disableAutoSelect(); } catch (e) { /* 무시 */ }
       location.reload(); // 화면 상태를 비우고 로그인 창부터 다시 시작한다
     };
@@ -615,6 +616,8 @@ td.miss{background:var(--warn-soft);color:var(--warn)}
 .rate{display:flex;gap:4px;flex-wrap:wrap;align-items:center;font-size:12px;color:var(--muted)}
 .rate button{border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:1px 9px;font-size:12px;cursor:pointer;color:var(--ink-2)}
 .rate button[aria-pressed=true]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.banner.privacy{border-color:var(--accent,#2446a8)}
+.growth{border:1px solid var(--line);border-radius:12px;padding:10px 12px;margin-bottom:12px;display:flex;flex-direction:column;gap:6px;background:var(--surface-2,#f3f5f8)}.growth b{font-size:12.5px;color:var(--muted)}.growth p{margin:2px 0 0;font-size:14px}
 .trap{border:1px dashed var(--warn);background:var(--warn-soft);border-radius:10px;padding:8px 10px;font-size:13px;display:flex;flex-direction:column;gap:6px}
 .trap b{color:var(--warn)}
 .toolnote{font-size:12px;color:var(--muted);font-family:var(--f-mono)}
@@ -1008,6 +1011,15 @@ function render(){
 }
 function stageState(s){const x=S.me.stages[s.id];if(x.done)return"done";if(!S.config.stages[s.id].open)return"locked";return s.id===S.cur?"cur":"open"}
 function autoFindings(id,x,me){return AUTOCHECKS.filter(a=>a.stage===id).filter(a=>{try{return a.test(x,me)}catch(e){return false}})}
+const PII=[
+ {re:/(?<!\d)01[016789][-.\s]?\d{3,4}[-.\s]?\d{4}(?!\d)/,n:"전화번호"},
+ {re:/[\w.+-]+@[\w-]+\.[\w.]+/,n:"이메일 주소"},
+ {re:/(?<!\d)\d{6}[-\s][1-4]\d{6}(?!\d)/,n:"주민등록번호"}];
+function piiFound(t){return PII.filter(p=>p.re.test(t||"")).map(p=>p.n)}
+function privacyHTML(){return `<div class="banner privacy" role="note"><p><b>시작하기 전에 꼭 읽어 주세요</b> · 내 노트와 길잡이와 나눈 대화는 <b>선생님의 기록 시트에 저장</b>되고, 수행 과정 확인과 피드백에만 쓰여요. 친구들은 볼 수 없어요. 길잡이에게 보내는 글은 외부 AI 서비스로 전송되니 <b>이름·전화번호·주소·이메일 같은 개인정보는 적지 마세요</b>. AI 답도 틀릴 수 있으니 도구 결과와 출처로 확인해요.</p><button class="btn sm primary" id="privacyOk">확인했어요</button></div>`}
+function growthHTML(){const d=S.me.stages.discover||{},c=S.me.stages.collect||{},f=d.fields||{},g=c.fields||{};
+ const rows=[["1차시 처음 생각",d.thought],["1차시에 고른 문제",f.pick],["2차시 분석 질문",g.question]].filter(r=>(r[1]||"").trim());
+ return `<div class="growth" aria-label="1차시와 비교"><span class="eyebrow">1차시의 나와 비교해요</span>${rows.length?rows.map(r=>`<div><b>${r[0]}</b><p>${esc(r[1])}</p></div>`).join(""):`<p class="muted" style="margin:0">1차시 기록이 아직 없어요.</p>`}<span class="muted" style="font-size:12.5px">전이 과제와 AI 협업 성찰을 쓸 때, 처음과 비교해 무엇이 달라졌는지 적어 보세요.</span></div>`}
 function renderStudent(){
   const s=STAGE[S.cur],x=st(),cfg=S.config.stages[s.id];
   const nudges=(S.me.nudges||[]).filter(n=>n.at>(S.me.nudgeSeen||0));
@@ -1018,6 +1030,7 @@ function renderStudent(){
     </div>
     <nav class="steps" aria-label="6차시 단계">${STAGES.map(t=>{const ss=stageState(t);return `<button class="step ${ss}" data-stage="${t.id}" ${t.id===S.cur?'aria-current="step"':""}><span class="n">${t.lesson}차시 · ${esc(t.agent)}</span><span class="t">${esc(t.name)}</span><span class="s">${ss==="done"?"완료":ss==="locked"?"아직 열리지 않음":t.id===S.cur?"진행 중":"열림"}</span></button>`}).join("")}</nav>
     ${S.config.announcement?`<div class="banner"><p><b>선생님 공지</b> · ${esc(S.config.announcement)}</p></div>`:""}
+    ${S.me.privacyAck?"":privacyHTML()}
     <div id="nudgeBox">${nudgeHTML(nudges)}</div>
     ${cfg.open||x.done?`<div class="work">${noteHTML(s,x)}${chatShellHTML(s,x)}</div>`:`<div class="panel lockcard"><div class="badge">${s.mark}</div><h2>${esc(s.name)} 단계는 아직 열리지 않았어요</h2><p class="muted">선생님이 단계를 열면 시작할 수 있어요. 그동안 앞 단계 노트를 다듬어 보세요.</p></div>`}
   </div>`;
@@ -1034,6 +1047,7 @@ function noteHTML(s,x){
       ${s.orange?`<p class="muted" style="margin:6px 0 0;font-size:13px"><b>Orange3:</b> ${esc(s.orange)}</p>`:""}
     </div></div>
     <hr class="sep">
+    ${s.id==="share"?growthHTML():""}
     <div class="stack">${s.fields.map(f=>`<label class="f" for="f-${s.id}-${f.id}">${esc(f.label)}<small>${esc(f.hint)}</small><textarea id="f-${s.id}-${f.id}" data-field="${f.id}">${esc(x.fields[f.id]||"")}</textarea></label>`).join("")}</div>
     ${["collect","explore","model"].includes(s.id)?`<div class="datapanel" id="dataPanel"></div>`:""}
     ${s.id==="conclude"?`<div class="row"><button class="btn sm" id="reportBtn">보고서 양식(Ⅰ~Ⅶ)으로 내 노트 모아 보기</button><span class="muted" style="font-size:12.5px">내가 쓴 문장만 모아요. AI가 쓰지 않아요.</span></div><div id="reportOut"></div>`:""}
@@ -1186,6 +1200,8 @@ ${trap?`[함정 찾기 모드] 이번 답변에는 학생이 비판적으로 읽
 }
 async function send(textOverride){
   const inp=$("#chatIn");let text=(textOverride||inp.value).trim();if(!text||S.busy||!S.sample)return;
+  if(!S.me.privacyAck){toast("위의 안내를 읽고 '확인했어요'를 눌러 주세요");return}
+  {const pii=piiFound(text);if(pii.length){toast(pii.join("·")+"로 보이는 내용이 있어요. 지우고 다시 보내 주세요");return}}
   const id=S.cur,x=st(),c=await loadChat(id),cfg=S.config.stages[id],cap=+cfg.cap||1;
   const ps=promptScore(text);
   if(!textOverride&&ps<=1&&text.length<25&&!S.coachShown){S.coachShown=true;$("#coach").innerHTML=`<div class="coach">질문을 더 좋게 만들어 볼까요? <b>맥락</b>(내 주제·데이터), <b>목적</b>(무엇을 알고 싶은지), <b>원하는 형태</b>(예: 위젯 이름만)를 넣으면 더 정확한 도움을 받아요. 그대로 보내려면 한 번 더 누르세요.</div>`;return}
@@ -1383,7 +1399,8 @@ document.addEventListener("click",async e=>{
   const b=e.target.closest("button");if(!b)return;
   if(b.dataset.role){S.view=b.dataset.role;render();return}
   if(b.dataset.stage){S.cur=b.dataset.stage;S.me.current=S.cur;S.chart=null;S.req=null;scheduleSave();renderStudent();return}
-  if(b.id==="thoughtBtn"){const v=$("#thoughtIn").value.trim();if(v.length<20){toast("20자 이상 적어 주세요. 짧아도 내 말로 쓰는 게 중요해요");return}st().thought=v;scheduleSave();renderStudent();return}
+  if(b.id==="privacyOk"){S.me.privacyAck=Date.now();scheduleSave();renderStudent();return}
+  if(b.id==="thoughtBtn"){const v=$("#thoughtIn").value.trim();if(v.length<20){toast("20자 이상 적어 주세요. 짧아도 내 말로 쓰는 게 중요해요");return}{const pii=piiFound(v);if(pii.length){toast(pii.join("·")+"로 보이는 내용이 있어요. 지우고 적어 주세요");return}}st().thought=v;scheduleSave();renderStudent();return}
   if(b.dataset.req){S.req=S.req===b.dataset.req?null:b.dataset.req;document.querySelectorAll("[data-req]").forEach(x=>x.setAttribute("aria-pressed",String(x.dataset.req===S.req)));return}
   if(b.id==="sendBtn"){send();return}
   if(b.id==="moreHint"){const cap=+S.config.stages[S.cur].cap||1;S.hint[S.cur]=Math.min(cap,(S.hint[S.cur]||1)+1);renderStudent();send("힌트 더 줘. (지금 막힌 부분을 조금 더 구체적으로 도와줘)");return}
@@ -1448,6 +1465,9 @@ setStatus(false,"미리보기 모드 · 이 브라우저에만 저장");
   if(user){S.isTeacher=await user.canEdit().catch(()=>false);S.uid=await user.id().catch(()=>null)}
   if(db&&S.uid){
     S.db=db;S.local=false;setStatus(true,"연결됨 · 학급과 공유 중");
+    if(loadLocal("dg-owner")!==S.uid){
+      try{Object.keys(localStorage).filter(k=>/^dg-(me|data|chat-)/.test(k)).forEach(k=>localStorage.removeItem(k))}catch(e){}
+      S.me=blankMe();S.data=null;S.chats={};S.cur="discover";saveLocal("dg-owner",S.uid)}
     try{const s=await db.doc("progress/"+S.uid).get();if(s.exists){S.docExists=true;const d=s.data(),b=blankMe();S.me={...b,...d,stages:Object.fromEntries(STAGES.map(t=>[t.id,{...blankStage(),...((d.stages||{})[t.id]||{})}]))};S.cur=STAGE[S.me.current]?S.me.current:"discover"}}catch(e){}
     db.doc("config/class").onSnapshot(s=>{if(s.exists){S.config=mergeConfig(s.data());if(S.view==="student"&&!document.activeElement?.matches("textarea,input"))renderStudent()}},()=>{});
     db.doc("progress/"+S.uid).onSnapshot(s=>{if(!s.exists)return;const d=s.data();S.me.nudges=d.nudges||[];S.me.teacherFb=d.teacherFb||{};
